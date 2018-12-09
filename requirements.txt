@@ -7,3 +7,6 @@ sendgrid
 opencv-python
 matplotlib
 pillow
+pymodm
+sphinx
+
