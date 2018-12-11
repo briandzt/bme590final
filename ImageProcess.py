@@ -33,7 +33,7 @@ def histequ(img, cmd):
     return outimg
 
 
-def constrech(img, cmd, perc):
+def constretch(img, cmd, perc):
     from ImageProcess import togray
     import numpy as np
     omax = 255
