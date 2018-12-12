@@ -51,7 +51,17 @@ class Upload extends Component {
 					</div>
 
 				</UploadField>
-				<img src={this.state.currentImageString} />
+				<div style={{margin: '10px'}}>
+					{
+						(this.state.currentImageString.length > 0) ? (
+							<img src={this.state.currentImageString} width={200} height={200}/>
+						) : (
+							<div>
+							</div>
+						)
+					}
+					</div>
+
 			</div>
 		)
 	}
