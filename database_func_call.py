@@ -4,7 +4,7 @@
 
 import sys
 from pymodm import connect, MongoModel, fields
-import datetime
+from datetime import datetime
 
 # connect to mongodb database
 connect("mongodb://void001:goduke18@ds129484.mlab.com:29484/bme590final")
@@ -17,21 +17,21 @@ class Imageset(MongoModel):
     Data Class used by MongoDB
     """
     user_email = fields.EmailField(primary_key=True)
-    imageset = fields.ImageField()
+    image_data = fields.CharField()
     actions = fields.ListField()
     timestamps = fields.ListField()
 
 
-def save_new_record(new_record):
+def save_new_record(r):
     """
 
     """
-    new_imageset = Imageset(
-        new_record['user_email'],
-        imageset=new_record['image_data'],
-        actions=['new_record'],
+    q = Imageset(
+        r['user_email'],
+        image_data=r['image_data'],
+        actions=['upload'],
         timestamps=[datetime.now()])
-    new_imageset.save()
+    q.save()
     return True
 
 
@@ -41,7 +41,7 @@ def query_a_record(key, field):
     """
     q = Imageset.objects.raw({"_id": key}).first()
     assert(q is not None)
-    return q[field]
+    return getattr(q, field)
 
 
 def update_a_record(key, field, value):
@@ -50,12 +50,25 @@ def update_a_record(key, field, value):
     """
     q = Imageset.objects.raw({"_id": key}).first()
     assert(q is not None)
-    q[field] = value
+    old_value = getattr(q, field)
+    if isinstance(old_value, list):
+        old_value.append(value)
+    else:
+        setattr(q, field, value)
     q.save()
-    return True
 
 
 def main():
+    """
+    """
+    # r = {'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'}
+    # save_new_record(r)
+
+    # update_a_record('111@duke.edu', 'image_data', '200dfjalejroiwqjf200')
+    update_a_record('111@duke.edu', 'actions', 'hist')
+    q = query_a_record('111@duke.edu', 'actions')
+    print(q)
+
     return 0
 
 
