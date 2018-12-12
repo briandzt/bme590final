@@ -37,7 +37,6 @@ class Beginning extends Component {
       this.state = {
          name: 'Cat in the Hat',
           fireRedirect: false
-
       }
       this.handleChange = this.handleChange.bind(this);
       this.handleSubmit = this.handleSubmit.bind(this);
@@ -51,15 +50,10 @@ class Beginning extends Component {
 
   handleSubmit = name => {
       this.setState({ fireRedirect: true })
-
   }
-
-
 
     render()
     {
-        const { fireRedirect } = this.state
-
         return (
 <div>
     <form >
@@ -81,11 +75,8 @@ class Beginning extends Component {
      >
         Submit
     </Button>
-    {fireRedirect && (<Redirect to={`./BetterDrawer`}/>)}
 </div>
         )
-
     }
 }
-
 export default Beginning;

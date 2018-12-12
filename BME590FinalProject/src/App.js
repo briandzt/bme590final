@@ -5,6 +5,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import VerticalLinearStepper from './BetterStepper';
 import PermanentDrawerLeft from './BetterDrawer'
 import Beginning from './Beginning'
+import Master from './MasterFile'
 
 
 class App extends Component {
@@ -14,7 +15,7 @@ class App extends Component {
       <div>
 
 
-        <PermanentDrawerLeft/>
+        <Master />
       </div>
         </MuiThemeProvider>
 

@@ -24,13 +24,12 @@ class RadioButtons extends React.Component {
         JPEG: false,
       PNG: false,
       TIFF: false,
-      name: "",
-      value: 'JPEG',
+      type: 'JPEG',
       count: 0,
   };
 
     handleSelect = event => {
-    this.setState({ value: event.target.value });
+    this.setState({ type: event.target.value });
   };
 
 render()
@@ -45,7 +44,7 @@ render()
                 <FormLabel component="legend">Select Download Format:</FormLabel>
                 <RadioGroup
                     className={classes.group}
-                    value={this.state.value}
+                    value={this.state.type}
                     onChange={this.handleSelect}>
                     <FormControlLabel value="JPEG" control={<Radio />} label="JPEG" />
                     <FormControlLabel value="PNG" control={<Radio />} label="PNG" />

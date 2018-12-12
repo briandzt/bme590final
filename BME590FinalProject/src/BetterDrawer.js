@@ -123,10 +123,6 @@ function handleGPS() {
 
 function PermanentDrawerLeft(props) {
   const { classes } = props;
-
-
-
-
         return (
             <MuiThemeProvider theme={theme}>
                 <div className={classes.root}>

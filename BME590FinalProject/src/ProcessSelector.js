@@ -32,13 +32,13 @@ class Checkboxes extends React.Component {
       RevVid: false,
       ContStretch: false,
       visible: false,
-      name: "",
-      value: 'RGB',
+      process: "",
+      value: 'rgb',
       count: 0,
   };
 
-  handleChange1 = name => event => {
-    this.setState({ [name]: event.target.checked });
+  handleChange1 = process => event => {
+    this.setState({ [process]: event.target.checked });
     this.setState({'count': this.state.count + 1});
 
       if(this.state.count % 2 === 0) {
@@ -49,8 +49,8 @@ class Checkboxes extends React.Component {
       }
 
   };
-  handleChange = name => event => {
-    this.setState({ [name]: event.target.checked });
+  handleChange = process => event => {
+    this.setState({ [process]: event.target.checked });
   };
    handleSelect = event => {
     this.setState({ value: event.target.value });
@@ -89,8 +89,8 @@ class Checkboxes extends React.Component {
                         value={this.state.value}
                         onChange={this.handleSelect}>
 
-                            <FormControlLabel value="RGB" control={<Radio />} label="Original RGB Image" />
-                            <FormControlLabel value="Gray" control={<Radio />} label="Grayscale Image" />
+                            <FormControlLabel value="rgb" control={<Radio />} label="Original RGB Image" />
+                            <FormControlLabel value="gray" control={<Radio />} label="Grayscale Image" />
                         </RadioGroup>
                         </FormControl>
 
