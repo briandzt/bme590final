@@ -2,11 +2,38 @@
 # -*- coding:utf-8 -*-
 # Author: Jason L
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 import toolbox_jason as jtb
 import database_func_call as db_func
+from validate_email import validate_email
+import base64
+from gzip_str import gunzip_bytes_obj, gzip_str
 
 app = Flask(__name__)
+
+
+@app.route("api/toolbox/validate/<email>", methods=["GET"])
+def is_a_validate_email(email):
+    is_valid = jtb.is_a_validate_email(email)
+    if is_valid:
+        response = 'ok'
+        local_path = jtb.string_from_email(email)
+        jtb.create_directory('tmp/', local_path)
+    else:
+        response = 'invalid input'
+    return jsonify(response)
+
+
+# @app.route("api/toolbox/upzip", methods=["POST"])
+# def unzip():
+#     r = request.get_json()
+#     ziped_data = base64.b64decode(r['data'])
+#
+#     gunzip_bytes_obj(ziped_data)
+#     # decode using base64string to zip file
+#
+#     # unzip to image list
+
 
 
 @app.route("/api/new_imageset", methods=["POST"])
@@ -30,7 +57,7 @@ def new_imageset():
         print("bad json, saving interupt".format(err))
     else:
         db_func.save_new_record(r)
-        return str(200)
+        return jsonify('')
 
 
 @app.route("/api/query_imageset", methods=["POST"])
