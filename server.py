@@ -5,87 +5,82 @@
 from flask import Flask, jsonify, request, send_file
 import toolbox_jason as jtb
 import database_func_call as db_func
-from validate_email import validate_email
-import base64
-from gzip_str import gunzip_bytes_obj, gzip_str
 
 app = Flask(__name__)
 
 
-@app.route("api/toolbox/validate/<email>", methods=["GET"])
-def is_a_validate_email(email):
-    is_valid = jtb.is_a_validate_email(email)
-    if is_valid:
-        response = 'ok'
-        local_path = jtb.string_from_email(email)
-        jtb.create_directory('tmp/', local_path)
+@app.route("api/toolbox/validate_email", methods=["POST"])
+def is_a_validate_email():
+    r = request.get_json()
+    try:
+        email = r['email']
+    except KeyError as err:
+        return jsonify({'response': err})
     else:
-        response = 'invalid input'
-    return jsonify(response)
+        if jtb.is_a_validate_email(email):
+            local_path = jtb.string_from_email(email)
+            jtb.create_directory('tmp/', local_path)
+            return jsonify({'response': 'ok'})
+        else:
+            return jsonify({'response': 'invalid email'})
 
 
-# @app.route("api/toolbox/upzip", methods=["POST"])
-# def unzip():
-#     r = request.get_json()
-#     ziped_data = base64.b64decode(r['data'])
-#
-#     gunzip_bytes_obj(ziped_data)
-#     # decode using base64string to zip file
-#
-#     # unzip to image list
-
-
-
-@app.route("/api/new_imageset", methods=["POST"])
+@app.route("/api/upload", methods=["POST"])
 def new_imageset():
     """
 
-    expected request data: POST /api/new_imageset with
+    expected request data:
     {
         "user_email": "suyash.kumar@duke.edu",
-        "imageset": 'adfaawerwer123', # in base64 format
+        "imageset": b'adfaawerwer123'
     }
 
-    :return: 400 if data entry is not valid, 200 if data is successfully saved
+    :return:
     """
     r = request.get_json()
-    entry_to_check = {'user_email': "suyash.kumar@duke.edu",
-                      'image_data': '\sdfafeafafe'}
     try:
-        jtb.validate_json_data_entry(r, entry_to_check)
-    except ValueError or TypeError as err:
-        print("bad json, saving interupt".format(err))
+        email = r['email']
+        image_data = r['imageset']
+    except KeyError as err:
+        return jsonify({'response': err})
     else:
-        db_func.save_new_record(r)
-        return jsonify('')
+        local_path = jtb.string_from_email(email)
+        if jtb.is_dir_exist('tmp/', local_path):
+            jtb.upzip_buffer(jtb.decode_base64(image_data), 'tmp/'+local_path+'/original')
+            db_func.save_new_record({'user_email':email, 'image_path':'tmp/'+local_path+'/original'})
+            return jsonify({'response':'ok'})
+        else:
+            return jsonify({'response':'the user does not exist'})
 
 
-@app.route("/api/query_imageset", methods=["POST"])
-def query_imageset():
+@app.route("/api/download_zip/", methods=["POST"])
+def download():
     """
 
-    Expected request data: POST /api/query_imageset with
-    {
-        "user_email": "suyash.kumar@duke.edu"
-        "field": "original"
-    }
-
-    :return: 400 if data entry is not valid, 200 if data is successfully saved
+    :return:
     """
     r = request.get_json()
-    entry_to_check = {
-        "user_email": "suyash.kumar@duke.edu",
-        "field": "original"
-    }
     try:
-        jtb.validate_json_data_entry(r, entry_to_check)
-    except ValueError or TypeError as err:
-        print("bad json, query interupt".format(err))
+        email = r['email']
+        field = r['imageset']
+    except KeyError as err:
+        return jsonify({'response': err})
     else:
-        return jsonify(db_func.query_a_record(r.key, r.field))
+        try:
+            image_path = db_func.query_a_record(email, field)
+        except AttributeError as err:
+            return jsonify({'response': err})
+        else:
+            data = jtb.zip_dir_to_buffer(image_path)
+            return send_file(
+                data,
+                mimetype='application/zip',
+                as_attachment=True,
+                attachment_filename='data.zip'
+            )
 
 
-@app.route("/api/actions/<action>", methods=["POST"])
+@app.route("/api/action/", methods=["POST"])
 def action_on_imageset():
     """
 
