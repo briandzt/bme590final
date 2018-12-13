@@ -28,7 +28,7 @@ def save_new_record(r):
     """
     q = Imageset(
         r['user_email'],
-        image_data=r['image_path'],
+        image_data=r['image_data'],
         actions=['upload'],
         timestamps=[datetime.now()])
     q.save()
@@ -75,7 +75,6 @@ def main():
         actions=['upload'],
         timestamps=[datetime.now()])
     getattr(q, 'email')
-
 
 
 if __name__ == '__main__':

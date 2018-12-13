@@ -1,5 +1,6 @@
 import pytest
-from database_func_call import save_new_record, query_a_record, update_a_record, Imageset
+from database_func_call import save_new_record, query_a_record
+from database_func_call import update_a_record, Imageset
 
 from pymodm import connect
 
@@ -8,15 +9,24 @@ connect("mongodb://void001:goduke18@ds129484.mlab.com:29484/bme590final")
 
 
 @pytest.mark.parametrize("test_input, expected", [
-    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, '111@duke.edu'),
-    ({'user_email': '222@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, '222@duke.edu'),
-    ({'user_email': '333@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, '333@duke.edu'),
-    ({'user_email': '444@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, '444@duke.edu'),
-    ({'user_email': '555@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, '555@duke.edu'),
-    ({'user_email': '666@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, '666@duke.edu'),
-    ({'user_email': '777@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, '777@duke.edu'),
-    ({'user_email': '888@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, '888@duke.edu'),
-    ({'user_email': '999@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, '999@duke.edu')
+    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     '111@duke.edu'),
+    ({'user_email': '222@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     '222@duke.edu'),
+    ({'user_email': '333@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     '333@duke.edu'),
+    ({'user_email': '444@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     '444@duke.edu'),
+    ({'user_email': '555@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     '555@duke.edu'),
+    ({'user_email': '666@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     '666@duke.edu'),
+    ({'user_email': '777@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     '777@duke.edu'),
+    ({'user_email': '888@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     '888@duke.edu'),
+    ({'user_email': '999@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     '999@duke.edu')
 ])
 def test_save_new_record(test_input, expected):
     save_new_record(test_input)
@@ -25,15 +35,24 @@ def test_save_new_record(test_input, expected):
 
 
 @pytest.mark.parametrize("test_input, expected", [
-    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, '111@duke.edu'),
-    ({'user_email': '222@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, '222@duke.edu'),
-    ({'user_email': '333@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, '333@duke.edu'),
-    ({'user_email': '444@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, '444@duke.edu'),
-    ({'user_email': '555@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, '555@duke.edu'),
-    ({'user_email': '666@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, '666@duke.edu'),
-    ({'user_email': '777@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, '777@duke.edu'),
-    ({'user_email': '888@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, '888@duke.edu'),
-    ({'user_email': '999@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, '999@duke.edu')
+    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     '111@duke.edu'),
+    ({'user_email': '222@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     '222@duke.edu'),
+    ({'user_email': '333@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     '333@duke.edu'),
+    ({'user_email': '444@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     '444@duke.edu'),
+    ({'user_email': '555@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     '555@duke.edu'),
+    ({'user_email': '666@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     '666@duke.edu'),
+    ({'user_email': '777@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     '777@duke.edu'),
+    ({'user_email': '888@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     '888@duke.edu'),
+    ({'user_email': '999@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     '999@duke.edu')
 ])
 def test_query_a_record(test_input, expected):
     q = query_a_record(test_input['user_email'], 'user_email')
@@ -41,24 +60,42 @@ def test_query_a_record(test_input, expected):
 
 
 @pytest.mark.parametrize("test_input, test_field, expected", [
-    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, 'image_data', '200dfjalejroiwqjf200'),
-    ({'user_email': '222@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, 'image_data', '200dfjalejroiwqjf200'),
-    ({'user_email': '333@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, 'image_data', '200dfjalejroiwqjf200'),
-    ({'user_email': '444@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, 'image_data', '200dfjalejroiwqjf200'),
-    ({'user_email': '555@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, 'image_data', '200dfjalejroiwqjf200'),
-    ({'user_email': '666@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, 'image_data', '200dfjalejroiwqjf200'),
-    ({'user_email': '777@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, 'image_data', '200dfjalejroiwqjf200'),
-    ({'user_email': '888@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, 'image_data', '200dfjalejroiwqjf200'),
-    ({'user_email': '999@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, 'image_data', '200dfjalejroiwqjf200'),
-    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, 'actions', 'hist1'),
-    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, 'actions', 'hist2'),
-    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, 'actions', 'hist3'),
-    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, 'actions', 'hist4'),
-    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, 'actions', 'hist5'),
-    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, 'actions', 'hist6'),
-    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, 'actions', 'hist7'),
-    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, 'actions', 'hist8'),
-    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'}, 'actions', 'hist9')
+    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     'image_data', '200dfjalejroiwqjf200'),
+    ({'user_email': '222@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     'image_data', '200dfjalejroiwqjf200'),
+    ({'user_email': '333@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     'image_data', '200dfjalejroiwqjf200'),
+    ({'user_email': '444@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     'image_data', '200dfjalejroiwqjf200'),
+    ({'user_email': '555@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     'image_data', '200dfjalejroiwqjf200'),
+    ({'user_email': '666@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     'image_data', '200dfjalejroiwqjf200'),
+    ({'user_email': '777@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     'image_data', '200dfjalejroiwqjf200'),
+    ({'user_email': '888@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     'image_data', '200dfjalejroiwqjf200'),
+    ({'user_email': '999@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     'image_data', '200dfjalejroiwqjf200'),
+    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     'actions', 'hist1'),
+    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     'actions', 'hist2'),
+    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     'actions', 'hist3'),
+    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     'actions', 'hist4'),
+    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     'actions', 'hist5'),
+    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     'actions', 'hist6'),
+    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     'actions', 'hist7'),
+    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     'actions', 'hist8'),
+    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
+     'actions', 'hist9')
 ])
 def test_update_a_record(test_input, test_field, expected):
     update_a_record(test_input['user_email'], test_field, expected)
@@ -67,5 +104,3 @@ def test_update_a_record(test_input, test_field, expected):
         assert(value[-1] == expected)
     else:
         assert(value == expected)
-
-

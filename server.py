@@ -46,11 +46,13 @@ def new_imageset():
     else:
         local_path = jtb.string_from_email(email)
         if jtb.is_dir_exist('tmp/', local_path):
-            jtb.upzip_buffer(jtb.decode_base64(image_data), 'tmp/'+local_path+'/original')
-            db_func.save_new_record({'user_email':email, 'image_path':'tmp/'+local_path+'/original'})
-            return jsonify({'response':'ok'})
+            unzip_path = 'tmp/'+local_path+'/original'
+            jtb.upzip_buffer(jtb.decode_base64(image_data), unzip_path)
+            db_func.save_new_record({'user_email': email,
+                                     'image_data': unzip_path})
+            return jsonify({'response': 'ok'})
         else:
-            return jsonify({'response':'the user does not exist'})
+            return jsonify({'response': 'the user does not exist'})
 
 
 @app.route("/api/download_zip/", methods=["POST"])

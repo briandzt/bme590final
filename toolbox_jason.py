@@ -49,6 +49,7 @@ def is_dir_exist(prefix, path):
     import os
     return os.path.isdir(prefix + path)
 
+
 # read & write file from/into buffer in bytes
 # --------------------------------------------
 def write_bytes_to_file(buffer, filename):
@@ -99,8 +100,6 @@ def zip_dir_to_buffer(dir):
     return data
 
 
-
-
 # encode & decode
 # ---------------------------------------
 def encode_base64(buffer):
@@ -113,8 +112,6 @@ def decode_base64(buffer):
     return base64.decodebytes(buffer)
 
 
-
-
 # test
 # ----------------------------------------
 def main():
@@ -122,10 +119,6 @@ def main():
     if is_a_validate_email(email):
         path = string_from_email(email)
         create_directory('tmp/', path)
-
-    # buffer = zip_a_diretory_into_buffer('/Users/zl190/Downloads/DRIVE/test/images')
-    # create_directory('', 'tmp')
-    # upzip_buffer_into_directory(buffer, 'tmp')
 
 
 if __name__ == '__main__':
