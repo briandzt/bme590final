@@ -28,7 +28,7 @@ def save_new_record(r):
     """
     q = Imageset(
         r['user_email'],
-        image_data=r['image_data'],
+        image_data=r['image_path'],
         actions=['upload'],
         timestamps=[datetime.now()])
     q.save()
@@ -65,11 +65,17 @@ def main():
     # save_new_record(r)
 
     # update_a_record('111@duke.edu', 'image_data', '200dfjalejroiwqjf200')
-    update_a_record('111@duke.edu', 'actions', 'hist')
-    q = query_a_record('111@duke.edu', 'actions')
-    print(q)
+    # update_a_record('111@duke.edu', 'actions', 'hist')
+    # q = query_a_record('111@duke.edu', 'actions')
+    # print(q)
+    r = {'user_email': '111@duke.edu', 'image_path': '200dfjalejroiwqjf300'}
+    q = Imageset(
+        r['user_email'],
+        image_data=r['image_path'],
+        actions=['upload'],
+        timestamps=[datetime.now()])
+    getattr(q, 'email')
 
-    return 0
 
 
 if __name__ == '__main__':
