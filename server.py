@@ -55,7 +55,7 @@ def new_imageset():
             return jsonify({'response': 'the user does not exist'}), 200
 
 
-@app.route("/api/download_zip/", methods=["POST"])
+@app.route("/api/download_zip", methods=["POST"])
 def download():
     """
 
@@ -82,7 +82,7 @@ def download():
             )
 
 
-@app.route("/api/action/", methods=["POST"])
+@app.route("/api/image-processing/action", methods=["POST"])
 def action_on_imageset():
     """
 
