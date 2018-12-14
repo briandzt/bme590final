@@ -36,6 +36,8 @@ import TableRow from "@material-ui/core/TableRow/TableRow";
 import TableCell from "@material-ui/core/TableCell/TableCell";
 import TableBody from "@material-ui/core/TableBody/TableBody";
 import JSZip from 'jszip'
+import axios from 'axios';
+import DownloadLink from 'react-download-link'
 
 
 const drawerWidth = 240;
@@ -47,6 +49,9 @@ var imagepresent = false
 var iszip = false
 var zipfile = new JSZip();
 var fileoutput = "";
+var validemail = false
+var filetitle = ""
+var stringarray = []
 
 
 const theme = createMuiTheme({
@@ -304,6 +309,18 @@ getDrawerContent(drawer, steps) {
                                         <TableCell numeric>{this.state.stats[2]}</TableCell>
                                     </TableRow>
                                 </TableBody>
+                                <DownloadLink
+                                    filename={filetitle}
+                                    exportFile={() => Promise.resolve(stringarray)}
+                                    tagName = "button"
+                                >
+                                    <Button
+                                    variant = "contained"
+                                    color = "secondary">
+                                        Download
+                                    </Button>
+
+                                </DownloadLink>
                               </Table>
                             <Divider />
                             <div>
@@ -392,7 +409,6 @@ getStepContent(step) {
                                             (iszip) ? (
                                                 <div>
                                                     Image(s) Uploaded
-                                                    File content: {fileoutput}
                                                 </div>
                                             ) : (
                                                 <div><img src={this.state.currentImageString} width={200} height={200}/>
@@ -517,6 +533,7 @@ imageValidate() {
 }
 
 
+
 handleNext = () => {
 
         if (this.state.activeStep === 0) {
@@ -549,6 +566,9 @@ handleNext = () => {
     };
 
     handleReset = () => {
+        valid = false
+        imagepresent = false
+        iszip = false
         this.setState({
             activeStep: 0,
             process: '',
@@ -569,8 +589,18 @@ handleChange = name => event => {
   };
 
   handleEmail = name => {
-      this.setState({
-          page: 1
+      axios.post("http://0.0.0.0:5000/api/testing", {
+        "email": this.state.name
+      }).then((response) => {
+          if(response.data.response === "ok") {
+            this.setState({
+                page: 1
+            })
+            alert("Email is valid")
+        }
+        else{
+            alert("This email is not valid")
+        }
       })
   }
 
@@ -609,6 +639,7 @@ handleChange = name => event => {
    onUpload = (files) => {
 		const reader = new FileReader()
 		const file = files[0]
+       filetitle = file.name
        imagepresent = true
 		reader.readAsDataURL(file);
 		reader.onloadend = () => {
@@ -619,6 +650,9 @@ handleChange = name => event => {
 	}
 
   handleOutput = name => {
+       var base64js = require('base64-js')
+      stringarray = base64js.toByteArray(this.state.currentImageString)
+
        this.setState({
           activeDrawer: 2
       })
