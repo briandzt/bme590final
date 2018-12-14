@@ -79,16 +79,36 @@ def logcomp(img, cmd):
     return outimg
 
 
-def revimg(img, cmd, mode=0):
+def revimg(img, cmd):
     import cv2
     from ImageProcess import togray
     if cmd == 'gray':
         img = togray(img)
-    if mode == 0:
-        outimg = cv2.flip(img, 0)
-    if mode == 1:
-        outimg = cv2.flip(img, 1)
-    if mode == 2:
-        outimg = cv2.flip(img, 0)
-        outimg = cv2.flip(img, 1)
+        outimg = img.astype(int) * -1 + 255
+    if cmd == 'rgb':
+        outimg = img
+        outimg[:, :, 0] = img[:, :, 0].astype(int) * -1 + 255
+        outimg[:, :, 1] = img[:, :, 1].astype(int) * -1 + 255
+        outimg[:, :, 2] = img[:, :, 2].astype(int) * -1 + 255
     return outimg
+
+
+def gethist(img, cmd):
+    import cv2
+    if cmd == 'gray':
+        outhist = cv2.calcHist([img], [0], None, [256], [0, 256])
+    if cmd == 'rgb':
+        outhist = []
+        outhist.append(cv2.calcHist([img], [0], None, [256], [0, 256]))
+        outhist.append(cv2.calcHist([img], [1], None, [256], [0, 256]))
+        outhist.append(cv2.calcHist([img], [2], None, [256], [0, 256]))
+    return outhist
+
+
+def getsize(img, cmd):
+    import cv2
+    if cmd == 'gray':
+        h, w = img.shape
+    if cmd == 'rgb':
+        h, w, _ = img.shape
+    return [h, w]
