@@ -9,20 +9,20 @@ import database_func_call as db_func
 app = Flask(__name__)
 
 
-@app.route("api/toolbox/validate_email", methods=["POST"])
+@app.route("/api/toolbox/validate_email", methods=["POST"])
 def is_a_validate_email():
     r = request.get_json()
     try:
         email = r['email']
     except KeyError as err:
-        return jsonify({'response': err})
+        return jsonify({'response': err}), 400
     else:
         if jtb.is_a_validate_email(email):
             local_path = jtb.string_from_email(email)
             jtb.create_directory('tmp/', local_path)
-            return jsonify({'response': 'ok'})
+            return jsonify({'response': 'ok'}), 200
         else:
-            return jsonify({'response': 'invalid email'})
+            return jsonify({'response': 'invalid email'}), 200
 
 
 @app.route("/api/upload", methods=["POST"])
@@ -42,7 +42,7 @@ def new_imageset():
         email = r['email']
         image_data = r['imageset']
     except KeyError as err:
-        return jsonify({'response': err})
+        return jsonify({'response': err}), 400
     else:
         local_path = jtb.string_from_email(email)
         if jtb.is_dir_exist('tmp/', local_path):
@@ -50,12 +50,12 @@ def new_imageset():
             jtb.upzip_buffer(jtb.decode_base64(image_data), unzip_path)
             db_func.save_new_record({'user_email': email,
                                      'image_data': unzip_path})
-            return jsonify({'response': 'ok'})
+            return jsonify({'response': 'ok'}), 200
         else:
-            return jsonify({'response': 'the user does not exist'})
+            return jsonify({'response': 'the user does not exist'}), 200
 
 
-@app.route("/api/download_zip/", methods=["POST"])
+@app.route("/api/download_zip", methods=["POST"])
 def download():
     """
 
@@ -82,7 +82,7 @@ def download():
             )
 
 
-@app.route("/api/action/", methods=["POST"])
+@app.route("/api/image-processing/action", methods=["POST"])
 def action_on_imageset():
     """
 
