@@ -1,18 +1,3 @@
-def validate_json_data_entry(request_json, entry_dict):
-    """
-    check if the request json data has the expected entry and the expected type
-    :param request_json: json data to check
-    :param entry_dict: dictionary has the format {entry:example_data}
-    :return:
-    """
-    for entry_name, data in entry_dict.items():
-        if entry_name not in request_json:
-            raise ValueError("No entry in the request json data")
-        if isinstance(type(entry_dict[entry_name]), type(data)):
-            raise TypeError("Data Type is not as expected")
-    return True
-
-
 # create a unique directory according to an email
 # --------------------------------------------
 def is_a_validate_email(email):
