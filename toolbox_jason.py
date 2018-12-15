@@ -3,8 +3,8 @@
 
 
 def is_a_validate_email(email):
-    from validate_email import validate_email
-    return validate_email(email)
+    import validate_email
+    return validate_email.validate_email(email)
 
 
 def string_from_email(email):
@@ -74,13 +74,16 @@ def unzip_buffer(buffer, dest_dir):
     z.extractall(dest_dir)
 
 
-def zip_dir_to_buffer(dir):
+def zip_dir_to_buffer(dir_string):
     from io import BytesIO
+    from pathlib import Path
+    from os.path import basename
     import zipfile
     data = BytesIO()
+    dir = Path(dir_string)
     with zipfile.ZipFile(data, mode='w') as z:
         for f_name in dir.iterdir():
-            z.write(f_name)
+            z.write(f_name, basename(f_name))
     data.seek(0)
     return data
 
@@ -94,7 +97,7 @@ def encode_base64(buffer):
 
 def decode_base64(buffer):
     import base64
-    return base64.decodebytes(buffer)
+    return base64.b64decode(buffer)
 
 
 # test
