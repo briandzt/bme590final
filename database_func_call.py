@@ -29,6 +29,7 @@ def save_new_record(r):
     q = Imageset(
         r['user_email'],
         image_data=r['image_data'],
+        brew_image_data = r['brew_image_data'],
         actions=['upload'],
         timestamps=[datetime.now()])
     q.save()
