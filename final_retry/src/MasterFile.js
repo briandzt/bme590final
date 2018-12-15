@@ -38,6 +38,8 @@ import TableBody from "@material-ui/core/TableBody/TableBody";
 import JSZip from 'jszip'
 import axios from 'axios';
 import DownloadLink from 'react-download-link'
+import FileSaver from 'file-saver';
+import saveAs from 'file-saver';
 
 
 const drawerWidth = 240;
@@ -48,10 +50,20 @@ var modifier = 0
 var imagepresent = false
 var iszip = false
 var zipfile = new JSZip();
+var zipoutputfile = new JSZip();
+var read_zip = new JSZip;
 var fileoutput = "";
 var validemail = false
 var filetitle = ""
 var stringarray = []
+var uploadsuccess = false
+var img = ""
+var imageOutputString = ""
+var zippedString = ""
+var imagedata
+var receivedZip
+var finalZip = []
+var testingZip = []
 
 
 const theme = createMuiTheme({
@@ -133,6 +145,9 @@ class Master extends Component {
         contrast: 5,
         imgformat: '',
         message: "",
+        zippedString: "",
+        actionList: ['','',''],
+
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -142,6 +157,8 @@ class Master extends Component {
     this.handleReset = this.handleReset.bind(this);
     this.getStepContent = this.getStepContent.bind(this)
         this.imageValidate = this.imageValidate.bind(this)
+        this.zipThis = this.zipThis.bind(this)
+        this.zipOutput = this.zipOutput.bind(this)
 
 }
 
@@ -149,41 +166,34 @@ getDrawerContent(drawer, steps) {
         switch (drawer) {
             case 0:
                 return(
-                      <div style={{marginTop: '70px', marginLeft: '30px'}}>
-
-            <div >
-                <h3>
-                    Reports for user:  {(this.state.stats.length > 0) ? this.state.name: "No Data"}
-                </h3>
-
-            </div>
-	<Table style={{width:'350px'}}>
-        <TableHead>
-          <TableRow>
-            <TableCell>Processing Method</TableCell>
-            <TableCell numeric>Number of Uses</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-            <TableRow>
-            	<TableCell>Histogram Equalization</TableCell>
-                <TableCell numeric>{this.state.stats[0]}</TableCell>
-            </TableRow>
-            <TableRow>
-            	<TableCell>Log Compression</TableCell>
-                <TableCell numeric>{this.state.stats[1]}</TableCell>
-            </TableRow>
-            <TableRow>
-            	<TableCell>Reverse Video</TableCell>
-                <TableCell numeric>{this.state.stats[2]}</TableCell>
-            </TableRow>
-            <TableRow>
-            	<TableCell>Contrast Stretching</TableCell>
-                <TableCell numeric>{this.state.stats[3]}</TableCell>
-            </TableRow>
-        </TableBody>
-      </Table>
-        </div>
+                    <div>
+                        <Table style={{width:'350px'}}>
+                            <TableHead>
+                              <TableRow>
+                                <TableCell>Processing Method</TableCell>
+                                <TableCell numeric>Number of Uses</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell>Histogram Equalization</TableCell>
+                                    <TableCell numeric>{this.state.stats[0]}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell>Log Compression</TableCell>
+                                    <TableCell numeric>{this.state.stats[1]}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell>Reverse Video</TableCell>
+                                    <TableCell numeric>{this.state.stats[2]}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell>Contrast Stretching</TableCell>
+                                    <TableCell numeric>{this.state.stats[3]}</TableCell>
+                                </TableRow>
+                            </TableBody>
+                          </Table>
+                    </div>
                 )
             case 1:
                 return(
@@ -286,6 +296,7 @@ getDrawerContent(drawer, steps) {
                             <h3>
                                 Output Comparison
                             </h3>
+
                         </div>
                         <div>
                             <Table style={{width:'350px', height:"100px"}}>
@@ -309,18 +320,6 @@ getDrawerContent(drawer, steps) {
                                         <TableCell numeric>{this.state.stats[2]}</TableCell>
                                     </TableRow>
                                 </TableBody>
-                                <DownloadLink
-                                    filename={filetitle}
-                                    exportFile={() => Promise.resolve(stringarray)}
-                                    tagName = "button"
-                                >
-                                    <Button
-                                    variant = "contained"
-                                    color = "secondary">
-                                        Download
-                                    </Button>
-
-                                </DownloadLink>
                               </Table>
                             <Divider />
                             <div>
@@ -402,6 +401,7 @@ getStepContent(step) {
 						    <div>
                                 <div>
                                     {this.imageValidate()}
+                                    {this.zipThis(0)}
                                 </div>
                                 <div>
                                     {
@@ -532,11 +532,70 @@ imageValidate() {
         }
 }
 
+zipThis(count){
+            imageOutputString = this.state.currentImageString.split(",")[1]
+        zipfile.file(filetitle, imageOutputString, {base64: true});
+        zipfile.generateAsync({type:"blob"})
+            .then(function(content) {
+                let Newreader = new FileReader();
+                Newreader.readAsDataURL(content);
+                Newreader.onloadend = function() {
+                    zippedString = Newreader.result
+                    if (count === 1) {
+                        saveAs(content, "archive.zip")
+                    }
+
+                }
+            });
+
+        if (count === 2) {
+            for (let i = 0; i < testingZip.length; i++) {
+                return (
+                    <div>
+                        <img src={finalZip[i]} width={200} height={200}/>
+                        Hello?
+                    </div>
+                )
+            }
+        }
+}
+
+zipOutput() {
+        testingZip = testingZip.split(",")[1]
+    read_zip.loadAsync(testingZip, {base64: true}).then(function (read_zip) {
+        Object.keys(read_zip.files).forEach(function (filename) {
+            JSZip.file(filename).async('nodebuffer').then(function (content) {
+                finalZip.push(content)
+                console.log(content)
+            });
+        });
+    });
+}
+
 
 
 handleNext = () => {
-
         if (this.state.activeStep === 0) {
+            if (iszip) {
+                imagedata = this.state.currentImageString
+            }
+            else {
+                imagedata = zippedString
+            }
+            axios.post("http://vcm-7306.vm.duke.edu:5000/api/testing", {
+                "user_email": this.state.name,
+                "image_data":imagedata,
+            }).then((response) => {
+                if(response.data.response === "ok") {
+                    valid = true
+                    uploadsuccess = true
+                }
+                else if (response.data.response === "The user does not exist"){
+                    valid = false
+                    uploadsuccess = false
+                    alert("This email is not valid")
+                }
+            })
             if(valid) {
                 this.setState(state => ({
             activeStep: state.activeStep + 1,
@@ -547,10 +606,27 @@ handleNext = () => {
                 if(modifier === 1) {
                     alert(message)
                 }
+                else if (uploadsuccess = false) {
+                    alert("Upload error, either click submit again or try a different image.")
+                }
                 else{
                     alert("Please upload an image in a valid file format (.png, .jpg, .tiff, or .zip.)")
                 }
             }
+        }
+        else if(this.state.activeStep === 2) {
+            if (this.state.process === "ContStretch") {
+                var cont = this.state.contrast
+            }
+            else {
+                cont = ""
+            }
+
+            this.setState({
+                activeStep: this.state.activeStep + 1,
+                actionList: [this.state.process, this.state.value, cont]
+            })
+
         }
         else {
             this.setState(state => ({
@@ -580,6 +656,17 @@ handleNext = () => {
     };
 
     handleSubmit = () => {
+        axios.post("http://vcm-7306.vm.duke.edu:5000/api/image-procesing/action", {
+        "user_email": this.state.name,
+            "action": this.state.actionList,
+      }).then((response) => {
+          if(response.data.response !== "KeyError" && response.data.response !== "image processing failed") {
+            alert("Images Successfully Submitted For Processing")
+              receivedZip = response.data.response
+        }
+
+
+      })
     };
 
 handleChange = name => event => {
@@ -589,8 +676,8 @@ handleChange = name => event => {
   };
 
   handleEmail = name => {
-      axios.post("http://0.0.0.0:5000/api/testing", {
-        "email": this.state.name
+      axios.post("http://vcm-7306.vm.duke.edu:5000/api/toolbox/validate-email", {
+        "user_email": this.state.name
       }).then((response) => {
           if(response.data.response === "ok") {
             this.setState({
@@ -643,24 +730,17 @@ handleChange = name => event => {
        imagepresent = true
 		reader.readAsDataURL(file);
 		reader.onloadend = () => {
-			console.log(reader.result);
             imgformat = reader.result.split(";")[0].split("/")[1]
+            testingZip = reader.result
 			this.setState({currentImageString: reader.result});
 		}
 	}
 
   handleOutput = name => {
-       var base64js = require('base64-js')
-      stringarray = base64js.toByteArray(this.state.currentImageString)
 
        this.setState({
           activeDrawer: 2
       })
-  }
-  handleValidate = name => {
-       this.setState({
-           imgformat: imgformat
-       })
   }
 
     render() {

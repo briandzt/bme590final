@@ -80,3 +80,14 @@ Hello World
                       label="Contrast Stretching"
                   />
               </FormGroup>
+
+
+
+
+              <div style={{marginTop: '70px', marginLeft: '30px'}}>
+
+            <div >
+                <h3>
+                    Reports for user:  {(this.state.stats.length > 0) ? this.state.name: "No Data"}
+                </h3>
+
