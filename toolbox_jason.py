@@ -26,7 +26,7 @@ def delete_directory(path):
 def create_directory(prefix, path):
     import os
     if is_dir_exist(prefix + path):
-        delete_directory(prefix+path)
+        delete_directory(prefix + path)
     os.makedirs(prefix+path)
 
 
