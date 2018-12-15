@@ -35,6 +35,21 @@ def string_from_email(email):
     return '_'.join(path_elems)
 
 
+def is_dir_exist(path):
+    """check whether a directory already exist
+
+    Parameters
+    ----------
+    path: string
+
+    Returns
+    -------
+    Bool: True or False
+    """
+    import os
+    return os.path.isdir(path)
+
+
 def delete_directory(path):
     """delete a directory if it's exist, otherwise do nothing
 
@@ -69,22 +84,26 @@ def create_directory(prefix, path):
     import os
     if is_dir_exist(prefix + path):
         delete_directory(prefix + path)
-    os.makedirs(prefix+path)
+    os.makedirs(prefix + path)
 
 
-def is_dir_exist(path):
-    """check whether a directory already exist
-
-    Parameters
-    ----------
-    path: string
-
-    Returns
-    -------
-    Bool: True or False
-    """
+def delete_all_files(path):
     import os
-    return os.path.isdir(path)
+    import shutil
+    if is_dir_exist(path):
+        for i in os.listdir(path):
+            filep = os.path.join(path, i)
+            try:
+                if os.path.isfile(filep):
+                    os.unlink(filep)
+            except Exception as e:
+                print(e)
+
+
+def getimage(directory):
+    import glob
+    import cv2
+    return [cv2.imread(file) for file in glob.glob(directory + "/*")]
 
 
 # read & write file from/into buffer in bytes
@@ -232,3 +251,22 @@ def decode_base64(buffer):
     """
     import base64
     return base64.b64decode(buffer)
+
+
+# Calculate action stats
+# ---------------------------------------
+def calcaction(email):
+    import database_func_call
+    actionlist = database_func_call.query_a_record(email, "actions")
+    actionstat = {'HistEq': 0, 'ContStretch': 0, 'RevVid': 0,
+                  'LogComp': 0}
+    for i in actionlist:
+        if i[0] == 'HistEq':
+            actionstat['HistEq'] += 1
+        elif i[0] == 'ContStretch':
+            actionstat['ContStretch'] += 1
+        elif i[0] == 'RevVid':
+            actionstat['RevVid'] += 1
+        elif i[0] == 'LogComp':
+            actionstat['LogComp'] += 1
+    return actionstat
