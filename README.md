@@ -7,17 +7,11 @@ The goal of this project is to generate an online
 website to perform simple image processing tasks. This Image Processor Final Project is totally running on cloud. 
 The program is constructed by two main parts: the GUI and the Processing Server. User can use a given url to access our ReactJS GUI and then the GUI will communicate with our processing server by POST/GET requests. 
 
-In practice, user need to provide a valid email to start to use the program 
-as an identical key. Each time user need to upload one or a set of image using 
-the GUI, and then choose a image processing action to brew the uploaded 
-image(s). The brewed image will be send back to the GUI, and user can view the 
-images on GUI, compare the different, and finally download the images. 
-What's more,
-the program provides a function for user to see the meta data. 
+In practice, user needs to provide a valid email to start to use the program. Each time the user needs to upload one image or a set of images in a zip file using the GUI. The user then chooses an image processing method to brew the uploaded 
+image(s). The brewed image(s) will then be sent back to the GUI, and user can view the image(s) on the GUI, compare them with the original, and finally download the images. The program also allows the user to view the meta data of the function (timestamp, processing time, and file size. 
 
 Attention:
-re-input email and re-upload image(s) will replace the images related to
-the user, if he/her has already uploaded images. The detailed work flow
+Re-inputting the same email or re-uploading image(s) will replace the images currently stored in the database for that  user if he/her has already uploaded images. The detailed work flow
 of this program is showed in the **sequence diagram** section. 
 
 ## sequence diagram
@@ -25,13 +19,10 @@ of this program is showed in the **sequence diagram** section.
 
 ## Setup and deployment
 
-It should be not hard If you want to run the program on your local 
-or virtual machine. the program is constructed by the main part: GUI
-and Server. Each part need to run before the program is working. 
-The internal server can be run by executing `server.py`. 
-The current setting allows the server to operate locally. To 
+The program is not difficult to run on your local 
+or virtual machine. the program is constructed by the main parts: the GUI and the Server. Each part needs to run before the program will work.  The internal server can be run by executing `python server.py` from a python environment. The current setting allows the server to operate locally. To 
 operate via internet, the last line in the `server.py`
-need to be changed.
+need to be updated with the proper host url.
 
 After download and setup the environment
 
