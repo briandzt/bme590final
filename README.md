@@ -44,7 +44,8 @@ After download and setup the environment
 
 To run the GUI part, simply use [...]
 
-` `
+`npm run start `
+Run this command from the base directory of the react app (final_retry)
 
 To run the Server part, simply use 
 
