@@ -1,5 +1,7 @@
 # create a unique directory according to an email
 # --------------------------------------------
+
+
 def is_a_validate_email(email):
     from validate_email import validate_email
     return validate_email(email)
@@ -30,9 +32,9 @@ def create_directory(prefix, path):
     os.makedirs(prefix+path)
 
 
-def is_dir_exist(prefix, path):
+def is_dir_exist(path):
     import os
-    return os.path.isdir(prefix + path)
+    return os.path.isdir(path)
 
 
 # read & write file from/into buffer in bytes
