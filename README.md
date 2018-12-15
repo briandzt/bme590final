@@ -4,11 +4,8 @@ Front End Walkthrough
 [Front End Walkthrough]: https://drive.google.com/drive/folders/15radViWQW0fC2GxgFO_NSzIB0-7BMIaW?usp=sharing
 
 The goal of this project is to generate an online 
-website to perform simple image processing tasks
-This Image Processor Final Project is totally running on cloud. 
-The program is constructed by two main part: GUI and Processing Server.
-User can use a given url to access our JSReact GUI and then GUI will
-communicate with our processing server by POST/GET requests. 
+website to perform simple image processing tasks. This Image Processor Final Project is totally running on cloud. 
+The program is constructed by two main parts: the GUI and the Processing Server. User can use a given url to access our ReactJS GUI and then the GUI will communicate with our processing server by POST/GET requests. 
 
 In practice, user need to provide a valid email to start to use the program 
 as an identical key. Each time user need to upload one or a set of image using 
