@@ -10,4 +10,4 @@ pillow
 validate_email
 pymodm
 sphinx
-
+flask_cors
