@@ -82,8 +82,8 @@ def new_imageset():
                 count += 1
                 originhist.append(gethist(i, 'rgb'))
                 originsize.append(getsize(i, 'rgb'))
-            return jsonify({'response': 'ok','image': togui,
-                            'hist':originhist,'size':originsize}), 200
+            return jsonify({'response': 'ok', 'image': togui,
+                            'hist': originhist, 'size': originsize}), 200
         else:
             return jsonify({'response': 'the user does not exist'}), 200
 
