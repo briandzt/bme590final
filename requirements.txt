@@ -7,3 +7,7 @@ sendgrid
 opencv-python
 matplotlib
 pillow
+validate_email
+pymodm
+sphinx
+flask_cors
