@@ -255,9 +255,7 @@ def decode_base64(buffer):
 
 # Calculate action stats
 # ---------------------------------------
-def calcaction(email):
-    import database_func_call
-    actionlist = database_func_call.query_a_record(email, "actions")
+def calcaction(actionlist):
     actionstat = {'HistEq': 0, 'ContStretch': 0, 'RevVid': 0,
                   'LogComp': 0}
     for i in actionlist:
