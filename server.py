@@ -99,12 +99,12 @@ def download():
         email = r['email']
         field = r['imageset']
     except KeyError as err:
-        return jsonify({'response': err}), 400
+        return jsonify({'response': "Input Key Invalid"}), 400
     else:
         try:
             image_path = db_func.query_a_record(email, field)
         except AttributeError as err:
-            return jsonify({'response': err}), 400
+            return jsonify({'response': "User don't have stored image"}), 400
         else:
             data = jtb.zip_dir_to_buffer(image_path)
             return send_file(
@@ -112,7 +112,7 @@ def download():
                 mimetype='application/zip',
                 as_attachment=True,
                 attachment_filename='data.zip'
-            )
+            ),200
 
 
 @app.route("/api/image-processing/action", methods=["POST"])
@@ -134,12 +134,12 @@ def action_on_imageset():
         email = r['email']
         action = r['action']
     except KeyError as err:
-        return jsonify({'response': err}), 400
+        return jsonify({'response': "Invalid Key"}), 400
     else:
         try:
             brew_path = db_func.query_a_record(email, 'brew_image_data')
         except AssertionError as err:
-            return jsonify({'response': err}), 400
+            return jsonify({'response': "User does not have process image stored"}), 400
         else:
             imageset = jtb.getimage(brew_path)
             outimg = []
