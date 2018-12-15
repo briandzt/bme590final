@@ -5,6 +5,8 @@
 from flask import Flask, jsonify, request, send_file
 import toolbox_jason as jtb
 import database_func_call as db_func
+from flask_cors import CORS
+CORS(app)
 
 app = Flask(__name__)
 
