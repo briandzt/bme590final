@@ -112,7 +112,7 @@ def download():
                 mimetype='application/zip',
                 as_attachment=True,
                 attachment_filename='data.zip'
-            ),200
+            ), 200
 
 
 @app.route("/api/image-processing/action", methods=["POST"])
@@ -139,7 +139,8 @@ def action_on_imageset():
         try:
             brew_path = db_func.query_a_record(email, 'brew_image_data')
         except AssertionError as err:
-            return jsonify({'response': "User does not have process image stored"}), 400
+            return jsonify({'response': "User does not have process image stored"}),\
+                   400
         else:
             imageset = jtb.getimage(brew_path)
             outimg = []
