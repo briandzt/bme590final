@@ -38,6 +38,10 @@ def new_imageset():
 
     :return:
     """
+    import cv2
+    import os
+    from ImageProcess import *
+    import base64
     r = request.get_json()
     try:
         email = r['email']
@@ -65,8 +69,21 @@ def new_imageset():
                                      'brew_image_data': brew_path})
             # get original image, its size and its hist
             imageset = jtb.getimage(unzip_path)
-
-            return jsonify({'response': 'ok'}), 200
+            togui = {}
+            originhist = []
+            originsize = []
+            count = 0
+            for i in imageset:
+                filename = str(count) + ".jpg"
+                cv2.imwrite(os.path.join(unzip_path, filename), i)
+                retval, buffer = cv2.imencode('.jpg', i)
+                jpg_as_text = base64.b64encode(buffer)
+                togui[str(count)] = jpg_as_text
+                count += 1
+                originhist.append(gethist(i, 'rgb'))
+                originsize.append(getsize(i, 'rgb'))
+            return jsonify({'response': 'ok', 'image': togui,
+                            'hist': originhist, 'size': originsize}), 200
         else:
             return jsonify({'response': 'the user does not exist'}), 200
 
@@ -82,12 +99,12 @@ def download():
         email = r['email']
         field = r['imageset']
     except KeyError as err:
-        return jsonify({'response': err}), 400
+        return jsonify({'response': "Input Key Invalid"}), 400
     else:
         try:
             image_path = db_func.query_a_record(email, field)
         except AttributeError as err:
-            return jsonify({'response': err}), 400
+            return jsonify({'response': "User don't have stored image"}), 400
         else:
             data = jtb.zip_dir_to_buffer(image_path)
             return send_file(
@@ -95,7 +112,7 @@ def download():
                 mimetype='application/zip',
                 as_attachment=True,
                 attachment_filename='data.zip'
-            )
+            ), 200
 
 
 @app.route("/api/image-processing/action", methods=["POST"])
@@ -117,12 +134,12 @@ def action_on_imageset():
         email = r['email']
         action = r['action']
     except KeyError as err:
-        return jsonify({'response': err}), 400
+        return jsonify({'response': "Invalid Key"}), 400
     else:
         try:
             brew_path = db_func.query_a_record(email, 'brew_image_data')
         except AssertionError as err:
-            return jsonify({'response': err}), 400
+            return jsonify({'response': "No process image stored"}), 400
         else:
             imageset = jtb.getimage(brew_path)
             outimg = []
