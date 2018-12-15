@@ -13,8 +13,8 @@ connect("mongodb://void001:goduke18@ds129484.mlab.com:29484/bme590final")
 
 
 class Imageset(MongoModel):
-    """
-    Data Class used by MongoDB
+    """Data Class used by MongoDB
+
     """
     user_email = fields.EmailField(primary_key=True)
     image_data = fields.CharField()
@@ -23,8 +23,16 @@ class Imageset(MongoModel):
 
 
 def save_new_record(r):
-    """
+    """save a new record using email as key and image_path
+    add actions and timestamps field automatically
 
+    Parameters
+    ----------
+    r: dictionary contains 'user_email' and 'image_data' field
+
+    Returns
+    -------
+    True
     """
     q = Imageset(
         r['user_email'],
@@ -36,8 +44,16 @@ def save_new_record(r):
 
 
 def query_a_record(key, field):
-    """
+    """query the value of a field
 
+    Parameters
+    ----------
+    key: string
+    field: string
+
+    Returns
+    -------
+    query value
     """
     q = Imageset.objects.raw({"_id": key}).first()
     assert(q is not None)
@@ -45,7 +61,16 @@ def query_a_record(key, field):
 
 
 def update_a_record(key, field, value):
-    """
+    """update a record
+
+    Parameters
+    ----------
+    key: string
+    field: string
+    value: according to the filed
+
+    Returns
+    -------
 
     """
     q = Imageset.objects.raw({"_id": key}).first()
@@ -56,26 +81,3 @@ def update_a_record(key, field, value):
     else:
         setattr(q, field, value)
     q.save()
-
-
-def main():
-    """
-    """
-    # r = {'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'}
-    # save_new_record(r)
-
-    # update_a_record('111@duke.edu', 'image_data', '200dfjalejroiwqjf200')
-    # update_a_record('111@duke.edu', 'actions', 'hist')
-    # q = query_a_record('111@duke.edu', 'actions')
-    # print(q)
-    r = {'user_email': '111@duke.edu', 'image_path': '200dfjalejroiwqjf300'}
-    q = Imageset(
-        r['user_email'],
-        image_data=r['image_path'],
-        actions=['upload'],
-        timestamps=[datetime.now()])
-    getattr(q, 'email')
-
-
-if __name__ == '__main__':
-    sys.exit(main())

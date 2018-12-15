@@ -1,0 +1,20 @@
+Post for email:
+
+axios.post("/toolbox/validate_email", {
+        "email": this.state.name
+      }).then((response) => {
+        if(response.data === "ok") {
+            this.setState({
+                page: 1
+            })
+            alert("Email is valid")
+        }
+        else{
+            alert("This email is not valid")
+        }
+      })
+
+
+
+
+
