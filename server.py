@@ -84,7 +84,7 @@ def new_imageset():
                 originhist.append(gethist(i, 'rgb'))
                 originsize.append(getsize(i, 'rgb'))
             return jsonify({'response': 'ok', 'image': togui,
-                            'hist': originhist, 'size': originsize}), 200
+                            'hist': originhist, 'imgsize': originsize}), 200
         else:
             return jsonify({'response': 'the user does not exist'}), 200
 
@@ -176,7 +176,7 @@ def action_on_imageset():
             togui = {}
             togui["image"] = {}
             togui["brew_hist"] = outhist
-            togui["size"] = outsize
+            togui["imgsize"] = outsize
             for i in outimg:
                 filename = str(count) + ".jpg"
                 cv2.imwrite(os.path.join(brew_path, filename), i)
@@ -184,7 +184,8 @@ def action_on_imageset():
                 jpg_as_text = base64.b64encode(buffer)
                 togui["image"][str(count)] = jpg_as_text
                 count += 1
-            actionstat = jtb.calcaction(email)
+            actionlist = db_func.query_a_record(email, "actions")
+            actionstat = jtb.calcaction(actionlist)
             togui["actions"] = actionstat
             return jsonify(togui), 200
 
