@@ -51,7 +51,7 @@ def new_imageset():
         return jsonify({'response': "Cannot find valid key"}), 400
     else:
         local_path = jtb.string_from_email(email)
-        if jtb.is_dir_exist('tmp/', local_path):
+        if jtb.is_dir_exist('tmp/' + local_path):
             # Define original and brew image save path
             unzip_path = 'tmp/' + local_path + '/original'
             brew_path = 'tmp/' + local_path + '/brew'
