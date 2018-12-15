@@ -60,6 +60,11 @@ def new_imageset():
                 jtb.delete_directory(unzip_path)
             if jtb.is_dir_exist(brew_path):
                 jtb.delete_directory(brew_path)
+
+            print("image_data from request -------")
+            print("type: {}".format(type(image_data)))
+            print("content: {}".format(image_data))
+            
             jtb.unzip_buffer(jtb.decode_base64(image_data.encode('utf8')),
                              unzip_path)
             jtb.unzip_buffer(jtb.decode_base64(image_data.encode('utf8')),
