@@ -10,10 +10,8 @@ def is_a_validate_email(email):
 def string_from_email(email):
     path_elems = []
     split_elems = email.split('@')  # say '111@duke.edu' -> '111', 'duke.edu'
-    print(split_elems)
     for elem in split_elems:
         path_elems.append(elem.split('.')[0])
-    print(path_elems)
     return '_'.join(path_elems)
 
 
