@@ -47,7 +47,8 @@ def new_imageset():
         local_path = jtb.string_from_email(email)
         if jtb.is_dir_exist('tmp/', local_path):
             unzip_path = 'tmp/'+local_path+'/original'
-            jtb.upzip_buffer(jtb.decode_base64(image_data), unzip_path)
+            jtb.unzip_buffer(jtb.decode_base64(image_data.encode('utf8')),
+                             unzip_path)
             db_func.save_new_record({'user_email': email,
                                      'image_data': unzip_path})
             return jsonify({'response': 'ok'}), 200
