@@ -27,12 +27,25 @@ def create_directory(prefix, path):
     import os
     if is_dir_exist(prefix + path):
         delete_directory(prefix + path)
-    os.makedirs(prefix+path)
+    os.makedirs(prefix + path)
 
 
 def is_dir_exist(path):
     import os
     return os.path.isdir(path)
+
+
+def delete_all_files(path):
+    import os
+    import shutil
+    if is_dir_exist(path):
+        for i in os.listdir(path):
+            filep = os.path.join(path, i)
+            try:
+                if os.path.isfile(filep):
+                    os.unlink(filep)
+            except Exception as e:
+                print(e)
 
 
 # read & write file from/into buffer in bytes
@@ -98,6 +111,11 @@ def encode_base64(buffer):
 def decode_base64(buffer):
     import base64
     return base64.b64decode(buffer)
+
+
+def getimage(directory):
+    import glob, cv2
+    return [cv2.imread(file) for file in glob.glob(directory + "/*")]
 
 
 # test
