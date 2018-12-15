@@ -40,7 +40,8 @@ def new_imageset():
     """
     import cv2
     import os
-    from ImageProcess import *
+    from ImageProcess import gethist
+    from ImageProcess import getsize
     import base64
     r = request.get_json()
     try:
@@ -124,7 +125,12 @@ def action_on_imageset():
     # query image_data from database
     # send image_date to DIP_alg and receive the brewed data
     # update the brewed image_data to database
-    from ImageProcess import *
+    from ImageProcess import histequ
+    from ImageProcess import revimg
+    from ImageProcess import contraststretch
+    from ImageProcess import logcomp
+    from ImageProcess import gethist
+    from ImageProcess import getsize
     from datetime import datetime
     import cv2
     import base64
