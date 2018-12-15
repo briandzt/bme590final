@@ -9,24 +9,24 @@ connect("mongodb://void001:goduke18@ds129484.mlab.com:29484/bme590final")
 
 
 @pytest.mark.parametrize("test_input, expected", [
-    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
-     '111@duke.edu'),
-    ({'user_email': '222@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
-     '222@duke.edu'),
-    ({'user_email': '333@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
-     '333@duke.edu'),
-    ({'user_email': '444@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
-     '444@duke.edu'),
-    ({'user_email': '555@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
-     '555@duke.edu'),
-    ({'user_email': '666@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
-     '666@duke.edu'),
-    ({'user_email': '777@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
-     '777@duke.edu'),
-    ({'user_email': '888@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
-     '888@duke.edu'),
-    ({'user_email': '999@duke.edu', 'image_data': '200dfjalejroiwqjf300'},
-     '999@duke.edu')
+    ({'user_email': '111@duke.edu', 'image_data': '200dfjalejroiwqjf300',
+      'brew_image_data': '200'}, '111@duke.edu'),
+    ({'user_email': '222@duke.edu', 'image_data': '200dfjalejroiwqjf300',
+      'brew_image_data': '200'}, '222@duke.edu'),
+    ({'user_email': '333@duke.edu', 'image_data': '200dfjalejroiwqjf300',
+      'brew_image_data': '200'}, '333@duke.edu'),
+    ({'user_email': '444@duke.edu', 'image_data': '200dfjalejroiwqjf300',
+      'brew_image_data': '200'}, '444@duke.edu'),
+    ({'user_email': '555@duke.edu', 'image_data': '200dfjalejroiwqjf300',
+      'brew_image_data': '200'}, '555@duke.edu'),
+    ({'user_email': '666@duke.edu', 'image_data': '200dfjalejroiwqjf300',
+      'brew_image_data': '200'}, '666@duke.edu'),
+    ({'user_email': '777@duke.edu', 'image_data': '200dfjalejroiwqjf300',
+      'brew_image_data': '200'}, '777@duke.edu'),
+    ({'user_email': '888@duke.edu', 'image_data': '200dfjalejroiwqjf300',
+      'brew_image_data': '200'}, '888@duke.edu'),
+    ({'user_email': '999@duke.edu', 'image_data': '200dfjalejroiwqjf300',
+      'brew_image_data': '200'}, '999@duke.edu')
 ])
 def test_save_new_record(test_input, expected):
     save_new_record(test_input)
