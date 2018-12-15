@@ -101,7 +101,8 @@ def delete_all_files(path):
 
 
 def getimage(directory):
-    import glob, cv2
+    import glob
+    import cv2
     return [cv2.imread(file) for file in glob.glob(directory + "/*")]
 
 

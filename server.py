@@ -6,6 +6,7 @@ from flask import Flask, jsonify, request, send_file
 import toolbox_jason as jtb
 import database_func_call as db_func
 from flask_cors import CORS
+
 app = Flask(__name__)
 
 
@@ -47,8 +48,8 @@ def new_imageset():
         local_path = jtb.string_from_email(email)
         if jtb.is_dir_exist('tmp/', local_path):
             # Define original and brew image save path
-            unzip_path = 'tmp/'+local_path+'/original'
-            brew_path = 'tmp/'+local_path+'/brew'
+            unzip_path = 'tmp/' + local_path + '/original'
+            brew_path = 'tmp/' + local_path + '/brew'
             # Check if directory already exist
             if jtb.is_dir_exist(unzip_path):
                 jtb.delete_directory(unzip_path)
@@ -62,6 +63,9 @@ def new_imageset():
                                      'image_data': unzip_path})
             db_func.save_new_record({'user_email': email,
                                      'brew_image_data': brew_path})
+            # get original image, its size and its hist
+            imageset = jtb.getimage(unzip_path)
+
             return jsonify({'response': 'ok'}), 200
         else:
             return jsonify({'response': 'the user does not exist'}), 200
@@ -103,7 +107,6 @@ def action_on_imageset():
     # query image_data from database
     # send image_date to DIP_alg and receive the brewed data
     # update the brewed image_data to database
-    from toolbox_jason import getimage
     from ImageProcess import *
     from datetime import datetime
     import cv2
@@ -121,7 +124,7 @@ def action_on_imageset():
         except AssertionError as err:
             return jsonify({'response': err}), 400
         else:
-            imageset = getimage(brew_path)
+            imageset = jtb.getimage(brew_path)
             outimg = []
             outhist = []
             outsize = []
@@ -145,22 +148,23 @@ def action_on_imageset():
             # Update record in database and setup dict to send back to gui
             db_func.update_a_record(email, 'timestamps', datetime.now())
             db_func.update_a_record(email, 'actions', action)
-            jtb.create_directory(brew_path,"")
+            jtb.create_directory(brew_path, "")
             count = 0
             togui = {}
             togui["image"] = {}
             togui["brew_hist"] = outhist
             togui["size"] = outsize
             for i in outimg:
-                filename = str(count)+".jpg"
-                cv2.imwrite(os.path.join(brew_path,filename),i)
-                retval, buffer = cv2.imencode('.jpg',i)
+                filename = str(count) + ".jpg"
+                cv2.imwrite(os.path.join(brew_path, filename), i)
+                retval, buffer = cv2.imencode('.jpg', i)
                 jpg_as_text = base64.b64encode(buffer)
                 togui["image"][str(count)] = jpg_as_text
-                count+=1
+                count += 1
             actionstat = jtb.calcaction(email)
             togui["actions"] = actionstat
-            return jsonify(togui),200
+            return jsonify(togui), 200
+
 
 if __name__ == '__main__':
     CORS(app)
