@@ -9,6 +9,7 @@ from datetime import datetime
 # connect to mongodb database
 connect("mongodb://void001:goduke18@ds129484.mlab.com:29484/bme590final")
 
+
 # database module
 
 
@@ -18,6 +19,7 @@ class Imageset(MongoModel):
     """
     user_email = fields.EmailField(primary_key=True)
     image_data = fields.CharField(blank=True)
+    brew_image_data = fields.CharField(blank=True)
     actions = fields.ListField(blank=True)
     timestamps = fields.ListField(blank=True)
 
@@ -38,6 +40,7 @@ def save_new_record(r):
     q = Imageset(
         r['user_email'],
         image_data=r['image_data'],
+        brew_image_data=r['brew_image_data'],
         actions=['upload'],
         timestamps=[datetime.now()])
     q.save()
@@ -57,7 +60,7 @@ def query_a_record(key, field):
     query value
     """
     q = Imageset.objects.raw({"_id": key}).first()
-    assert(q is not None)
+    assert (q is not None)
     return getattr(q, field)
 
 
@@ -75,7 +78,7 @@ def update_a_record(key, field, value):
 
     """
     q = Imageset.objects.raw({"_id": key}).first()
-    assert(q is not None)
+    assert (q is not None)
     old_value = getattr(q, field)
     if isinstance(old_value, list):
         old_value.append(value)
@@ -116,7 +119,6 @@ def clear_fields(key, field_list):
     -------
 
     """
-
     for field in field_list:
         try:
             clear_a_field(key, field)

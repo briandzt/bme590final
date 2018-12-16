@@ -35,7 +35,7 @@ def new_imageset():
         "user_email": "suyash.kumar@duke.edu",
         "imageset": b'adfaawerwer123'
     }
-
+    data:application/zip;base64,
     :return:
     """
     import cv2
@@ -47,6 +47,7 @@ def new_imageset():
     try:
         email = r['email']
         image_data = r['imageset']
+        image_data = image_data[28:]
     except KeyError as err:
         return jsonify({'response': "Cannot find valid key"}), 400
     else:
@@ -65,8 +66,7 @@ def new_imageset():
             jtb.unzip_buffer(jtb.decode_base64(image_data.encode('utf8')),
                              brew_path)
             db_func.save_new_record({'user_email': email,
-                                     'image_data': unzip_path})
-            db_func.save_new_record({'user_email': email,
+                                     'image_data': unzip_path,
                                      'brew_image_data': brew_path})
             # get original image, its size and its hist
             imageset = jtb.getimage(unzip_path)
