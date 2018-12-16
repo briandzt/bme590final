@@ -104,13 +104,13 @@ def gethist(img, cmd):
     import numpy as np
     if cmd == 'gray':
         outhist = cv2.calcHist([img], [0], None, [256], [0, 256])
-        outhist = outhist.astype(int)
+        outhist = [int(x) for x in outhist]
     if cmd == 'rgb':
         outhist = []
         outhist.append(cv2.calcHist([img], [0], None, [256], [0, 256]))
         outhist.append(cv2.calcHist([img], [1], None, [256], [0, 256]))
         outhist.append(cv2.calcHist([img], [2], None, [256], [0, 256]))
-        outhist = outhist.astype(int)
+        outhist = [int(x) for x in outhist]
     return outhist
 
 
@@ -120,6 +120,6 @@ def getsize(img, cmd):
         h, w = img.shape
     if cmd == 'rgb':
         h, w, _ = img.shape
-    h = h.astype(int)
-    w = w.astype(int)
+    h = int(h)
+    w = int(w)
     return [h, w]
