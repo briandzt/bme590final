@@ -40,6 +40,7 @@ def new_imageset():
     """
     import cv2
     import os
+    import numpy as np
     from ImageProcess import gethist
     from ImageProcess import getsize
     import base64
@@ -70,13 +71,13 @@ def new_imageset():
                                      'brew_image_data': brew_path})
             # get original image, its size and its hist
             imageset = jtb.getimage(unzip_path)
+            imageset = imageset.astype(np.uint8)
             togui = {}
             originhist = []
             originsize = []
             count = 0
             for i in imageset:
                 filename = str(count) + ".jpg"
-                cv2.imwrite(os.path.join(unzip_path, filename), i)
                 retval, buffer = cv2.imencode('.jpg', i)
                 jpg_as_text = base64.b64encode(buffer)
                 togui[str(count)] = jpg_as_text
@@ -132,6 +133,7 @@ def action_on_imageset():
     from ImageProcess import gethist
     from ImageProcess import getsize
     from datetime import datetime
+    import numpy as np
     import cv2
     import base64
     import os
@@ -148,6 +150,7 @@ def action_on_imageset():
             return jsonify({'response': "No process image stored"}), 400
         else:
             imageset = jtb.getimage(brew_path)
+            imageset = imageset.astype(np.uint8)
             outimg = []
             outhist = []
             outsize = []
