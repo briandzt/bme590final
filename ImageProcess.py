@@ -122,6 +122,7 @@ def gethist(img, cmd):
 def getsize(img, cmd):
     import cv2
     if cmd == 'gray':
+        img = togray(img)
         h, w = img.shape
     if cmd == 'rgb':
         h, w, _ = img.shape
