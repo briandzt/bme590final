@@ -49,7 +49,9 @@ def is_a_validate_email():
         if jtb.is_a_validate_email(email):
             local_path = jtb.string_from_email(email)
             jtb.create_directory('tmp/', local_path)
-            db_func.clear_fields(email, ['image_data', 'brew_image_data', 'actions', 'timestampss'])
+            field_list = ['image_data', 'brew_image_data',
+                          'actions', 'timestampss']
+            db_func.clear_fields(email, field_list)
             return jsonify({'response': 'ok'}), 200
         else:
             return jsonify({'response': 'invalid email'}), 200

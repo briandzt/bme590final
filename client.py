@@ -2,26 +2,23 @@ import requests
 import toolbox_jason as jtb
 
 
+host_address = 'http://127.0.0.1:5000/'
+image_dir = '/Users/zl190/Downloads/DRIVE/test/images/'
+
+
 def test_api_toolbox_validate_email():
-    r_status = requests.post("http://127.0.0.1:5000/api/toolbox/validate_email",
+    r_status = requests.post(host_address + 'api/toolbox/validate_email',
                              json={'email': '111@duke.edu'})
     # status = r_status.json()
     print(r_status)
 
 
 def test_api_upload():
-    buffer = jtb.zip_dir_to_buffer('/Users/zl190/Downloads/DRIVE/test/images/')
+    buffer = jtb.zip_dir_to_buffer(image_dir)
     encoded_buf = jtb.encode_base64(buffer.read())
 
     print(type(encoded_buf))
-    # r_status = requests.post("http://vcm-7306.vm.duke.edu:5000/api/
-    # toolbox/validate_email",
-    # json={'email':'111@duke.edu'})
-    # r_status = requests.post("http://vcm-7306.vm.duke.edu:5000/api/upload",
-    # json={'email':'111@duke.edu', '
-    # imageset':str(encoded_buf)})
-
-    r_status = requests.post("http://127.0.0.1:5000/api/upload",
+    r_status = requests.post(host_address + "api/upload",
                              json={'email': '111@duke.edu',
                                    'imageset': encoded_buf.decode('utf8')})
 
@@ -30,9 +27,9 @@ def test_api_upload():
 
 
 def test_api_download():
-    r_status = requests.post("http://127.0.0.1:5000/api/download_zip",
-                             json={'email':'111@duke.edu',
-                                   'imageset':'image_data'})
+    r_status = requests.post(host_address + "api/download_zip",
+                             json={'email': '111@duke.edu',
+                                   'imageset': 'image_data'})
     print(r_status.content)
     jtb.unzip_buffer(r_status.content, 'tmp/unzip')
 
