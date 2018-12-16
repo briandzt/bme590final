@@ -2,6 +2,24 @@
 # -*- coding:utf-8 -*-
 # Author: Jason L
 
+"""An simple image processing server
+
+This server provides the following basic functions:
+    images uploading,
+    meta data extraction
+    image processing,
+    download the brewed images
+
+by the following four api:
+    /api/toolbox/validate_email
+    /api/upload
+    /api/download_zip
+    /api/image-processing/action
+
+
+.. _Flask https://www.flaskapi.org
+
+"""
 from flask import Flask, jsonify, request, send_file
 import toolbox_jason as jtb
 import database_func_call as db_func
@@ -12,6 +30,16 @@ app = Flask(__name__)
 
 @app.route("/api/toolbox/validate_email", methods=["POST"])
 def is_a_validate_email():
+    """validate if a string has a email format
+
+
+    Returns
+    -------
+    json, status code
+        the `response` field inside json format contains detailed message
+        status code 400 if the request can't be handled by the server
+                    200 if the request can be handled by the server
+    """
     r = request.get_json()
     try:
         email = r['email']
@@ -28,15 +56,15 @@ def is_a_validate_email():
 
 @app.route("/api/upload", methods=["POST"])
 def new_imageset():
-    """
+    """handle new uploaded images
 
-    expected request data:
-    {
-        "user_email": "suyash.kumar@duke.edu",
-        "imageset": b'adfaawerwer123'
-    }
-    data:application/zip;base64,
-    :return:
+    the new uploaded images will be validated, stored and preprocessed
+    the request should contain `user_email` and `imageset` fields
+
+    Returns
+    -------
+    json, status code
+        meta data extracted from images will be returned
     """
     import cv2
     import os
@@ -91,9 +119,11 @@ def new_imageset():
 
 @app.route("/api/download_zip", methods=["POST"])
 def download():
-    """
+    """provide a download function for original and brewed images
 
-    :return:
+    Returns
+    -------
+
     """
     r = request.get_json()
     try:
@@ -118,7 +148,7 @@ def download():
 
 @app.route("/api/image-processing/action", methods=["POST"])
 def action_on_imageset():
-    """
+    """deal with image processing request
 
     """
     # check json fields
