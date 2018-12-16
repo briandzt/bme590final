@@ -1,3 +1,31 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author: Jason L
+
+
+"""toolbox of small and basic but important functions
+
+The toolbox module is separated from server module and contains two kinds of
+function mainly:
+
+string & bytes operation:
+    is_a_validate_email()
+    string_from_email()
+    encode_base64()
+    decode_base64()
+
+file and directory operation:
+    is_dir_exist()
+    delete_directory()
+    create_directory()
+    delete_all_files()
+    write_bytes_to_file()
+    read_file_in_bytes()
+
+
+"""
+
+
 # create a unique directory according to an email
 # --------------------------------------------
 
@@ -11,7 +39,8 @@ def is_a_validate_email(email):
 
     Returns
     -------
-    True or False
+    bool
+        True or False
     """
     import validate_email
     return validate_email.validate_email(email)
@@ -26,6 +55,7 @@ def string_from_email(email):
 
     Returns
     -------
+    string
     a valid path_string
     """
     path_elems = []
@@ -44,7 +74,8 @@ def is_dir_exist(path):
 
     Returns
     -------
-    Bool: True or False
+    bool
+        True or False
     """
     import os
     return os.path.isdir(path)
@@ -133,7 +164,8 @@ def read_file_in_bytes(filename):
 
     Returns
     -------
-    buffer: bytes
+    bytes
+        buffer
 
     """
     from io import BytesIO
@@ -184,7 +216,7 @@ def unzip_buffer(buffer, dest_dir):
 
     Parameters
     ----------
-    buffer: file-like object, like io.BytesIO
+    buffer: io.BytesIO
     dest_dir: string
 
     Returns
@@ -202,7 +234,8 @@ def zip_dir_to_buffer(dir_string):
 
     Parameters
     ----------
-    dir_string: directory to zip
+    dir_string: string
+        directory to zip
 
     Returns
     -------
@@ -228,11 +261,12 @@ def encode_base64(buffer):
 
     Parameters
     ----------
-    buffer: binary-like object
+    buffer: io.Bytes()
 
     Returns
     -------
-    encoded binary-like object
+    io.Bytes()
+        binary-like object
     """
     import base64
     return base64.encodebytes(buffer)
@@ -243,11 +277,13 @@ def decode_base64(buffer):
 
     Parameters
     ----------
-    buffer: encoded binary-like object
+    buffer: io.Bytes()
+        encoded binary-like object
 
     Returns
     -------
-    decoded binary-like object
+    io.Bytes()
+        decoded binary-like object
     """
     import base64
     return base64.b64decode(buffer)
