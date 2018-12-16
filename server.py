@@ -198,7 +198,7 @@ def action_on_imageset():
                     outimg.append(logcomp(i, action[1]))
             else:
                 return jsonify({'response': 'invalid action name'}), 200
-            for i in imageset:
+            for i in outimg:
                 outhist.append(gethist(i, action[1]))
                 outsize.append(getsize(i, action[1]))
             # Update record in database and setup dict to send back to gui
