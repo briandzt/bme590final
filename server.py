@@ -78,7 +78,8 @@ def new_imageset():
             count = 0
             for i in imageset:
                 retval, buffer = cv2.imencode('.jpg', i)
-                jpg_as_text = base64.b64encode(buffer)
+                jpg_as_text = str(base64.b64encode(buffer))
+                jpg_as_text = jpg_as_text[2:-1]
                 togui[str(count)] = jpg_as_text
                 count += 1
                 originhist.append(gethist(i, 'rgb'))
@@ -183,7 +184,8 @@ def action_on_imageset():
                 filename = str(count) + ".jpg"
                 cv2.imwrite(os.path.join(brew_path, filename), i)
                 retval, buffer = cv2.imencode('.jpg', i)
-                jpg_as_text = base64.b64encode(buffer)
+                jpg_as_text = str(base64.b64encode(buffer))
+                jpg_as_text = jpg_as_text[2:-1]
                 togui["image"][str(count)] = jpg_as_text
                 count += 1
             actionlist = db_func.query_a_record(email, "actions")
