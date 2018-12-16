@@ -1,13 +1,63 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# Author: Jason L
+
+
+"""toolbox of small and basic but important functions
+
+The toolbox module is separated from server module and contains two kinds of
+function mainly:
+
+string & bytes operation:
+    is_a_validate_email()
+    string_from_email()
+    encode_base64()
+    decode_base64()
+
+file and directory operation:
+    is_dir_exist()
+    delete_directory()
+    create_directory()
+    delete_all_files()
+    write_bytes_to_file()
+    read_file_in_bytes()
+
+
+"""
+
+
 # create a unique directory according to an email
 # --------------------------------------------
 
 
 def is_a_validate_email(email):
+    """check whether the input string has a email-style format
+
+    Parameters
+    ----------
+    email: string
+
+    Returns
+    -------
+    bool
+        True or False
+    """
     import validate_email
     return validate_email.validate_email(email)
 
 
 def string_from_email(email):
+    """generate a unique path_string from a valid email_address
+
+    Parameters
+    ----------
+    email: string
+
+    Returns
+    -------
+    string
+    a valid path_string
+    """
     path_elems = []
     split_elems = email.split('@')  # say '111@duke.edu' -> '111', 'duke.edu'
     for elem in split_elems:
@@ -15,34 +65,109 @@ def string_from_email(email):
     return '_'.join(path_elems)
 
 
+def is_dir_exist(path):
+    """check whether a directory already exist
+
+    Parameters
+    ----------
+    path: string
+
+    Returns
+    -------
+    bool
+        True or False
+    """
+    import os
+    return os.path.isdir(path)
+
+
 def delete_directory(path):
-    import shutil
-    try:
-        shutil.rmtree(path)
-    except OSError as e:
-        print("Error: %s - %s." % (e.filename, e.strerror))
+    """delete a directory if it's exist, otherwise do nothing
+
+    Parameters
+    ----------
+    path: string
+
+    Returns
+    -------
+
+    """
+    if is_dir_exist(path):
+        import shutil
+        try:
+            shutil.rmtree(path)
+        except OSError as e:
+            print("Error: %s - %s." % (e.filename, e.strerror))
 
 
 def create_directory(prefix, path):
+    """Create a directory, if it's already exist, delete it then create it
+
+    Parameters
+    ----------
+    prefix: string
+    path: string
+
+    Returns
+    -------
+
+    """
     import os
     if is_dir_exist(prefix + path):
         delete_directory(prefix + path)
-    os.makedirs(prefix+path)
+    os.makedirs(prefix + path)
 
 
-def is_dir_exist(path):
+def delete_all_files(path):
     import os
-    return os.path.isdir(path)
+    import shutil
+    if is_dir_exist(path):
+        for i in os.listdir(path):
+            filep = os.path.join(path, i)
+            try:
+                if os.path.isfile(filep):
+                    os.unlink(filep)
+            except Exception as e:
+                print(e)
+
+
+def getimage(directory):
+    import glob
+    import cv2
+    return [cv2.imread(file) for file in glob.glob(directory + "/*")]
 
 
 # read & write file from/into buffer in bytes
 # --------------------------------------------
 def write_bytes_to_file(buffer, filename):
+    """write a buffer into file
+
+    Parameters
+    ----------
+    buffer: bytes buffer
+    filename: string
+
+    Returns
+    -------
+
+    """
     with open(filename, mode='wb') as file:
         file.write(buffer)
 
 
 def read_file_in_bytes(filename):
+    """read file into file-like object
+
+    Parameters
+    ----------
+    filename: string
+
+    Returns
+    -------
+    bytes
+        buffer
+
+    """
     from io import BytesIO
     buffer_io = BytesIO()
     with open(filename, mode='rb') as file:
@@ -54,7 +179,15 @@ def read_file_in_bytes(filename):
 # zip & unzip from/to a directory
 # ---------------------------------------
 def zip_dir_to_file(name_of_zipfile, source_dir):
-    """
+    """zip an entire directory into a zip file
+
+    Parameters
+    ----------
+    name_of_zipfile: string
+    source_dir: string
+
+    Returns
+    -------
 
     """
     import shutil
@@ -62,12 +195,34 @@ def zip_dir_to_file(name_of_zipfile, source_dir):
 
 
 def upzip_file(name_zipfile, dest_dir):
+    """unzip a zip file into destination directory
+
+    Parameters
+    ----------
+    name_zipfile: string
+    dest_dir: string
+
+    Returns
+    -------
+
+    """
     import zipfile
     with zipfile.ZipFile(name_zipfile) as zf:
         zf.extractall(dest_dir)
 
 
 def unzip_buffer(buffer, dest_dir):
+    """unzip a file-like object into a given directory
+
+    Parameters
+    ----------
+    buffer: io.BytesIO
+    dest_dir: string
+
+    Returns
+    -------
+
+    """
     import zipfile
     from io import BytesIO
     z = zipfile.ZipFile(BytesIO(buffer))
@@ -75,6 +230,17 @@ def unzip_buffer(buffer, dest_dir):
 
 
 def zip_dir_to_buffer(dir_string):
+    """zip a directory into an file-like object
+
+    Parameters
+    ----------
+    dir_string: string
+        directory to zip
+
+    Returns
+    -------
+
+    """
     from io import BytesIO
     from pathlib import Path
     from os.path import basename
@@ -91,24 +257,50 @@ def zip_dir_to_buffer(dir_string):
 # encode & decode
 # ---------------------------------------
 def encode_base64(buffer):
+    """encode an binary-like object
+
+    Parameters
+    ----------
+    buffer: io.Bytes()
+
+    Returns
+    -------
+    io.Bytes()
+        binary-like object
+    """
     import base64
     return base64.encodebytes(buffer)
 
 
 def decode_base64(buffer):
+    """decode an encoded binary like object
+
+    Parameters
+    ----------
+    buffer: io.Bytes()
+        encoded binary-like object
+
+    Returns
+    -------
+    io.Bytes()
+        decoded binary-like object
+    """
     import base64
     return base64.b64decode(buffer)
 
 
-# test
-# ----------------------------------------
-def main():
-    email = '111@duke.edu'
-    if is_a_validate_email(email):
-        path = string_from_email(email)
-        create_directory('tmp/', path)
-
-
-if __name__ == '__main__':
-    import sys
-    sys.exit(main())
+# Calculate action stats
+# ---------------------------------------
+def calcaction(actionlist):
+    actionstat = {'HistEq': 0, 'ContStretch': 0, 'RevVid': 0,
+                  'LogComp': 0}
+    for i in actionlist:
+        if i[0] == 'HistEq':
+            actionstat['HistEq'] += 1
+        elif i[0] == 'ContStretch':
+            actionstat['ContStretch'] += 1
+        elif i[0] == 'RevVid':
+            actionstat['RevVid'] += 1
+        elif i[0] == 'LogComp':
+            actionstat['LogComp'] += 1
+    return actionstat
