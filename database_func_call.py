@@ -18,15 +18,16 @@ class Imageset(MongoModel):
 
     """
     user_email = fields.EmailField(primary_key=True)
-    image_data = fields.CharField()
-    brew_image_data = fields.CharField()
-    actions = fields.ListField()
-    timestamps = fields.ListField()
+    image_data = fields.CharField(blank=True)
+    brew_image_data = fields.CharField(blank=True)
+    actions = fields.ListField(blank=True)
+    timestamps = fields.ListField(blank=True)
 
 
 def save_new_record(r):
-    """save a new record using email as key and image_path
-    add actions and timestamps field automatically
+    """save a new record
+    user_email  and image_data must be given
+    actions and timestamps field will be set automatically
 
     Parameters
     ----------
@@ -47,7 +48,7 @@ def save_new_record(r):
 
 
 def query_a_record(key, field):
-    """query the value of a field
+    """get the value of a field
 
     Parameters
     ----------
@@ -64,7 +65,7 @@ def query_a_record(key, field):
 
 
 def update_a_record(key, field, value):
-    """update a record
+    """set a new value for a field
 
     Parameters
     ----------
@@ -81,6 +82,45 @@ def update_a_record(key, field, value):
     old_value = getattr(q, field)
     if isinstance(old_value, list):
         old_value.append(value)
+        setattr(q, field, old_value)
     else:
         setattr(q, field, value)
     q.save()
+
+
+def clear_a_field(key, field):
+    """set value of a field to None
+
+    Parameters
+    ----------
+    key
+    field
+
+    Returns
+    -------
+
+    """
+    q = Imageset.objects.raw({"_id": key}).first()
+    assert (q is not None)
+    setattr(q, field, None)
+    q.save()
+
+
+def clear_fields(key, field_list):
+    """set values of multiple fields to None
+    not exist fields given by field_list will be ignored
+
+    Parameters
+    ----------
+    key
+    field_list
+
+    Returns
+    -------
+
+    """
+    for field in field_list:
+        try:
+            clear_a_field(key, field)
+        except AttributeError:
+            None
