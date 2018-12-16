@@ -191,6 +191,7 @@ def action_on_imageset():
             actionlist = db_func.query_a_record(email, "actions")
             actionstat = jtb.calcaction(actionlist)
             togui["actions"] = actionstat
+            togui['reponse'] = 'ok'
             return jsonify(togui), 200
 
 
