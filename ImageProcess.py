@@ -110,7 +110,7 @@ def gethist(img, cmd):
         outhist.append(cv2.calcHist([img], [0], None, [256], [0, 256]))
         outhist.append(cv2.calcHist([img], [1], None, [256], [0, 256]))
         outhist.append(cv2.calcHist([img], [2], None, [256], [0, 256]))
-        outhist = [int(x) for x in outhist]
+        outhist = [x.astype(int) for x in outhist]
     return outhist
 
 
