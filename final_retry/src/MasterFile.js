@@ -40,6 +40,7 @@ import axios from 'axios';
 import DownloadLink from 'react-download-link'
 import FileSaver from 'file-saver';
 import saveAs from 'file-saver';
+import Plot from 'react-plotly.js'
 
 
 const drawerWidth = 240;
@@ -64,6 +65,18 @@ var imagedata
 var receivedZip
 var finalZip = []
 var testingZip = []
+var originalhist = []
+var processhist = []
+var imagesizes = 0
+var brewedimagesizes = []
+var data = []
+var data1 = []
+var base64reps = []
+var brewedbase64reps = []
+var imagenum = 1
+var brewedimagenum = 1
+var prefix = ""
+var xvar = []
 
 
 const theme = createMuiTheme({
@@ -141,12 +154,13 @@ class Master extends Component {
         count: 0,
         activeStep: 0,
         type: 'JPEG',
-        stats: [1,15,10,6],
+        stats: [],
         contrast: 5,
         imgformat: '',
         message: "",
         zippedString: "",
         actionList: ['','',''],
+        uploadedImage: "",
 
     };
 
@@ -159,7 +173,6 @@ class Master extends Component {
         this.imageValidate = this.imageValidate.bind(this)
         this.zipThis = this.zipThis.bind(this)
         this.zipOutput = this.zipOutput.bind(this)
-
 }
 
 getDrawerContent(drawer, steps) {
@@ -238,7 +251,7 @@ getDrawerContent(drawer, steps) {
               </div>
               <div>
                   {
-                      (iszip)? (<div>Zip File</div>) : (<img src={this.state.currentImageString} width={200} height={200}/>)
+                      (iszip)? (<div>Zip File</div>) : (<img src={this.state.uploadedImage} width={200} height={200}/>)
 
                   }
 
@@ -260,7 +273,18 @@ getDrawerContent(drawer, steps) {
               <div>
                   Download Type: {this.state.type}
                   </div>
+              <div>
 
+                  Image Size: {imagesizes}
+              </div>
+              <div>
+                  Histogram: {processhist}
+                  {console.log(typeof processhist)}
+                  {console.log(typeof originalhist)}
+              </div>
+              <div>
+                    Number of images:
+              </div>
               <Button
                         disabled={this.state.activeStep === 0}
                         onClick={this.handleBack}
@@ -317,7 +341,7 @@ getDrawerContent(drawer, steps) {
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>File Size</TableCell>
-                                        <TableCell numeric>{this.state.stats[2]}</TableCell>
+                                        <TableCell numeric>{imagesizes.split(",")[0]} X {imagesizes.split(",")[1]}</TableCell>
                                     </TableRow>
                                 </TableBody>
                               </Table>
@@ -328,12 +352,12 @@ getDrawerContent(drawer, steps) {
                                         <TableRow>
                                             <TableCell>
                                                 <h3>
-                                                    Original Image
+                                                    Original Image(s)
                                                 </h3>
                                             </TableCell>
                                             <TableCell>
                                                 <h3>
-                                                    Processed Image
+                                                    Processed Image(s)
                                                 </h3>
                                             </TableCell>
                                         </TableRow>
@@ -341,15 +365,38 @@ getDrawerContent(drawer, steps) {
                                     <TableBody>
                                         <TableRow>
                                             <TableCell><img src={this.state.currentImageString} width={300} height={300}/></TableCell>
-                                            <TableCell><img src={this.state.currentImageString} width={300} height={300}/></TableCell>
+                                            <TableCell><img src={this.state.brewedImageString} width={300} height={300}/></TableCell>
+                                        </TableRow>
+                                        <TableRow>
+                                            <TableCell>
+                                                    {
+                                                    (originalhist.length > 0)?
+                                                        (
+                                                            <Plot
+                                                            data={data}
+                                                            layout={{title: 'Original Histogram'}}
+                                                            />
+                                                        ):(<div></div>)
+                                                }
+
+                                            </TableCell>
+                                        </TableRow>
+
+                                            <TableRow>
+                                            <TableCell>
+                                                {
+                                                    (originalhist.length > 0)?
+                                                        (
+                                                            <Plot
+                                                            data={data}
+                                                            layout={{title: 'Processed Histogram'}}
+                                                            />
+                                                        ):(<div></div>)
+                                                }
+                                            </TableCell>
                                         </TableRow>
                                     </TableBody>
-
                                 </Table>
-
-
-
-
                             </div>
 
 
@@ -582,25 +629,55 @@ handleNext = () => {
             else {
                 imagedata = zippedString
             }
-            axios.post("http://vcm-7306.vm.duke.edu:5000/api/testing", {
-                "user_email": this.state.name,
-                "image_data":imagedata,
+            if(valid) {
+                axios.post("http://vcm-7306.vm.duke.edu:5000/api/upload", {
+                "email": this.state.name,
+                "imageset":imagedata,
             }).then((response) => {
                 if(response.data.response === "ok") {
                     valid = true
                     uploadsuccess = true
+                    originalhist = response.data.hist.toString()
+                    let histvalues = originalhist.split(',')
+
+                    var traceblue = {
+                        x:xvar,
+                        y:histvalues.slice(0,255),
+                        type: 'lines+points',
+                        marker: {color: 'blue'}
+                    }
+                    var tracegreen = {
+                        x:xvar,
+                        y:histvalues.slice(256,512),
+                        type: 'lines+points',
+                        marker: {color: 'green'}
+                    }
+                    var tracered = {
+                        x:xvar,
+                        y:histvalues.slice(513,768),
+                        type: 'lines+points',
+                        marker: {color: 'red'}
+                    }
+                    data = [traceblue, tracegreen, tracered];
+
+                    imagesizes = response.data.imgsize[0].toString()
+                    console.log(imagesizes.substring(0,3))
+                    base64reps = prefix + "," + response.data.image[0]
+                    imagenum = response.data.image.length
+                    this.setState(state => ({
+                        activeStep: state.activeStep + 1,
+                        uploadedImage: base64reps
+                    }));
+
                 }
                 else if (response.data.response === "The user does not exist"){
                     valid = false
                     uploadsuccess = false
-                    alert("This email is not valid")
+                    alert("hello?")
                 }
             })
-            if(valid) {
-                this.setState(state => ({
-            activeStep: state.activeStep + 1,
-                }));
-                alert("Image Successfully Uploaded to Database")
+
+
             }
             else {
                 if(modifier === 1) {
@@ -656,13 +733,42 @@ handleNext = () => {
     };
 
     handleSubmit = () => {
-        axios.post("http://vcm-7306.vm.duke.edu:5000/api/image-procesing/action", {
-        "user_email": this.state.name,
+        axios.post("http://vcm-7306.vm.duke.edu:5000/api/image-processing/action", {
+        "email": this.state.name,
             "action": this.state.actionList,
       }).then((response) => {
           if(response.data.response !== "KeyError" && response.data.response !== "image processing failed") {
             alert("Images Successfully Submitted For Processing")
-              receivedZip = response.data.response
+              /*
+              processhist = response.data.hist.toString()
+
+              let processvalues = processhist.split(',')
+                    var processblue = {
+                        x:xvar,
+                        y:processvalues.slice(0,255),
+                        type: 'lines+points',
+                        marker: {color: 'blue'}
+                    }
+                    var processgreen = {
+                        x:xvar,
+                        y:processvalues.slice(256,512),
+                        type: 'lines+points',
+                        marker: {color: 'green'}
+                    }
+                    var processred = {
+                        x:xvar,
+                        y:processvalues.slice(513,2768),
+                        type: 'lines+points',
+                        marker: {color: 'red'}
+                    }
+                    data1 = [processblue, processgreen, processred];
+                    */
+                    brewedimagesizes = response.data.imgsize[0]
+                    brewedbase64reps = prefix + "," + response.data.image[0]
+                    brewedimagenum = response.data.image.length
+                    this.setState({
+                        brewedImageString: brewedbase64reps
+                    });
         }
 
 
@@ -676,8 +782,8 @@ handleChange = name => event => {
   };
 
   handleEmail = name => {
-      axios.post("http://vcm-7306.vm.duke.edu:5000/api/toolbox/validate-email", {
-        "user_email": this.state.name
+      axios.post("http://vcm-7306.vm.duke.edu:5000/api/toolbox/validate_email", {
+        "email": this.state.name
       }).then((response) => {
           if(response.data.response === "ok") {
             this.setState({
@@ -731,13 +837,16 @@ handleChange = name => event => {
 		reader.readAsDataURL(file);
 		reader.onloadend = () => {
             imgformat = reader.result.split(";")[0].split("/")[1]
+            prefix = reader.result.split(",")[0]
             testingZip = reader.result
 			this.setState({currentImageString: reader.result});
 		}
 	}
 
   handleOutput = name => {
-
+       for (var i = 1; i <= 768; i++) {
+           xvar.push(i);
+       }
        this.setState({
           activeDrawer: 2
       })
