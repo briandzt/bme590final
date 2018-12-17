@@ -82,6 +82,7 @@ def new_imageset():
             ss.store_data(email, image_data)
             import image_services as img_serv
             data_path = ss.get_data_path(email, 'original')
+            print(data_path)
             togui, originhist, originsize = img_serv.extra_meta(data_path)
             return jsonify({'response': 'ok', 'image': togui,
                             'hist': originhist, 'imgsize': originsize}), 200
