@@ -88,7 +88,7 @@ def save_new_record(r):
         image_data=r['image_data'],
         brew_image_data=r['brew_image_data'],
         actions=['upload'],
-        timestamps=[datetime.now()])
+        timestamps=[str(datetime.now().timestamp())])
     q.save()
 
 
@@ -103,11 +103,9 @@ def query_a_record(key, field):
     Returns
     -------
     None, string or list
-        None is not exist,
-        else string or list depends on the query field
+        string or list depends on the query field
     """
     q = Imageset.objects.raw({"_id": key}).first()
-    assert (q is not None)
     return getattr(q, field)
 
 
@@ -128,7 +126,6 @@ def update_a_record(key, field, value):
 
     """
     q = Imageset.objects.raw({"_id": key}).first()
-    assert (q is not None)
     old_value = getattr(q, field)
     if isinstance(old_value, list):
         old_value.append(value)
@@ -153,7 +150,6 @@ def clear_a_field(key, field):
 
     """
     q = Imageset.objects.raw({"_id": key}).first()
-    assert (q is not None)
     setattr(q, field, None)
     q.save()
 
@@ -178,3 +174,7 @@ def clear_fields(key, field_list):
             clear_a_field(key, field)
         except AttributeError:
             pass
+
+
+if __name__ == '__main__':
+    print(query_a_record('111@duke.edu', 'actions'))

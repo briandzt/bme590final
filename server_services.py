@@ -58,7 +58,85 @@ def store_data(email, data):
                              'brew_image_data': usr_path + '/brew/'})
 
 
+def getimage(directory):
+    """read images into numpy array
+
+    Parameters
+    ----------
+    directory
+
+    Returns
+    -------
+
+    """
+    import glob
+    import cv2
+    import numpy as np
+    imageset = [cv2.imread(file) for file in glob.glob(directory + "/*")]
+    return [x.astype(np.uint8) for x in imageset]
+
+
+def action_stat(email):
+    import toolbox_jason as jtb
+    import database_func_call as db_func
+    actionlist = db_func.query_a_record(email, "actions")
+    actionstat = jtb.calcaction(actionlist)
+    return actionstat
+
+
+def update_brew_image(outimg, brew_path):
+    import cv2
+    import os
+    count = 0
+    import toolbox_jason as jtb
+    jtb.create_directory(brew_path, "")
+    for i in outimg:
+        filename = str(count) + ".jpg"
+        cv2.imwrite(os.path.join(brew_path, filename), i)
+        count += 1
+
+
 def download_preparation(email):
     import toolbox_jason as jtb
     usr_path = jtb.string_from_email(email)
-    jtb.create_directory(path_prefix, usr_path + '/download/')
+    path = usr_path + '/download/'
+    jtb.create_directory(path_prefix, path)
+    return path_prefix + path
+
+
+def format_conversion(dest_dir, img_file, new_format):
+    """convert a single image format
+
+    Parameters
+    ----------
+    dest_dir : string
+    img_file : file-like
+    new_format: string
+
+    Returns
+    -------
+
+    """
+    from PIL import Image
+    from os.path import basename
+    img = Image.open(img_file)
+    img.save(dest_dir + basename(img_file).split('.')[0] + '.' + new_format)
+
+
+def format_conversion_batch(dest_dir, source_dir, new_format):
+    """convert multiply image format
+
+    Parameters
+    ----------
+    dest_dir
+    source_dir
+
+    Returns
+    -------
+
+    """
+    from pathlib import Path
+    directory = Path(source_dir)
+    for f_name in directory.iterdir():
+        format_conversion(dest_dir, f_name, new_format)
+

@@ -1,86 +1,128 @@
-def getimage(directory):
-    """read images into numpy array
-
-    Parameters
-    ----------
-    directory
-
-    Returns
-    -------
-
-    """
-    import glob
-    import cv2
-    return [cv2.imread(file) for file in glob.glob(directory + "/*")]
+action_list = ['HistEq', 'ContStretch', 'RevVid', 'LogComp']
 
 
-def extra_meta(image_dir):
+def validate_action(action):
+    if action in action_list:
+        return True
+    else:
+        return False
+
+
+def get_hists(para1, imgset):
+    from ImageProcess import gethist
+    outhist = []
+    for i in imgset:
+        outhist.append(gethist(i, para1))
+    return outhist
+
+
+def get_sizes(para1, imgset):
+    from ImageProcess import getsize
+    outsize = []
+    for i in imgset:
+        outsize.append(getsize(i, para1))
+    return outsize
+
+
+def extra_meta(imageset):
     """extra meta data from images
 
+    get original image, its size and its hist
+
     Parameters
     ----------
-    image_dir
+    imageset : np array
+
+    Returns
+    -------
+
+    """
+    hist = get_hists('rgb', imageset)
+    size = get_sizes('rgb', imageset)
+
+    return hist, size
+
+
+def convert_image_to_dict(imageset):
+    """convert imageset from numpy array to a dict
+
+    the dict contains each each image as base64 encoded string
+
+    Parameters
+    ----------
+    imageset
 
     Returns
     -------
 
     """
     import cv2
-    import numpy as np
-    from ImageProcess import gethist
-    from ImageProcess import getsize
-    import toolbox_jason as jtb
     import base64
-    # get original image, its size and its hist
-    imageset = getimage(image_dir)
-    imageset = [x.astype(np.uint8) for x in imageset]
-    togui = {}
-    originhist = []
-    originsize = []
+    image_dict = {}
     count = 0
     for i in imageset:
         retval, buffer = cv2.imencode('.jpg', i)
         jpg_as_text = str(base64.b64encode(buffer))
         jpg_as_text = jpg_as_text[2:-1]
-        togui[str(count)] = jpg_as_text
+        image_dict[str(count)] = jpg_as_text
         count += 1
-        originhist.append(gethist(i, 'rgb'))
-        originsize.append(getsize(i, 'rgb'))
-    return togui, originhist, originsize
+    return image_dict
 
 
-def format_conversion(dest_dir, img_file, new_format):
-    """convert a single image format
-
-    Parameters
-    ----------
-    dest_dir : string
-    basename : string
-    new_format: string
-
-    Returns
-    -------
-
-    """
-    from PIL import Image
-    from os.path import basename
-    img = Image.open(img_file)
-    img.save(dest_dir + basename(img_file).split('.')[0] + '.' + new_format)
+def hist_eq(para1, imgset):
+    from ImageProcess import histequ
+    outimg = []
+    for i in imgset:
+        outimg.append(histequ(i, para1))
+    return outimg
 
 
-def format_conversion_batch(dest_dir, source_dir, new_format):
-    """convert multiply image format
+def con_stretch(para1, para2, imgset):
+    from ImageProcess import contraststretch
+    outimg = []
+    for i in imgset:
+        outimg.append(contraststretch(i, para1, para2))
+    return outimg
 
-    Parameters
-    ----------
-    dest_dir
-    source_dir
 
-    Returns
-    -------
+def rev_img(para1, imgset):
+    from ImageProcess import revimg
+    outimg = []
+    for i in imgset:
+        outimg.append(revimg(i, para1))
+    return outimg
 
-    """
-    from pathlib import Path
-    directory = Path(source_dir)
-    for f_name in directory.iterdir():
-        format_conversion(dest_dir, f_name, new_format)
+
+def log_comp(para1, imgset):
+    from ImageProcess import logcomp
+    outimg = []
+    for i in imgset:
+        outimg.append(logcomp(i, para1))
+    return outimg
+
+
+def apply_actions(action, img):
+    if action[0] == 'HistEq':
+        return hist_eq(action[1], img)
+    elif action[0] == 'ContStretch':
+        return con_stretch(action[1], action[2], img)
+    elif action[0] == 'RevVid':
+        return rev_img(action[1], img)
+    elif action[0] == 'LogComp':
+        return log_comp(action[1], img)
+
+
+def image_processing(action, imageset):
+    outimg = apply_actions(action, imageset)
+    return outimg
+
+
+def ret_data_wrapper(outimg, outhist, outsize, actionstat):
+    togui = {}
+    togui["image"] = convert_image_to_dict(outimg)
+    togui["brew_hist"] = outhist
+    togui["imgsize"] = outsize
+
+    togui["actions"] = actionstat
+    togui['response'] = 'ok'
+    return togui

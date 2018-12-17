@@ -83,8 +83,10 @@ def new_imageset():
             import image_services as img_serv
             data_path = ss.get_data_path(email, 'original')
             print(data_path)
-            togui, originhist, originsize = img_serv.extra_meta(data_path)
-            return jsonify({'response': 'ok', 'image': togui,
+            imageset = ss.getimage(data_path)
+            originhist, originsize = img_serv.extra_meta(imageset)
+            img_dict = img_serv.convert_image_to_dict(imageset)
+            return jsonify({'response': 'ok', 'image': img_dict,
                             'hist': originhist, 'imgsize': originsize}), 200
         else:
             return jsonify({'response': 'the user does not exist'}), 200
@@ -108,12 +110,13 @@ def download():
     else:
         try:
             image_path = db_func.query_a_record(email, kind)
+            print("request json is {}".format(r))
+            print("email is {}, kind is {}, path is {}".format(email, kind, image_path))
         except AttributeError as err:
             return jsonify({'response': "User don't have stored image"}), 400
         else:
-            path = ss.get_data_path(email, 'download')
-            import image_services as img_serv
-            img_serv.format_conversion_batch(path, image_path, fmt)
+            path = ss.download_preparation(email)
+            ss.format_conversion_batch(path, image_path, fmt)
             data = jtb.zip_dir_to_buffer(path)
             return send_file(
                 data,
@@ -128,25 +131,10 @@ def action_on_imageset():
     """deal with image processing request
 
     """
-    # check json fields
-    # query image_data from database
-    # send image_date to DIP_alg and receive the brewed data
-    # update the brewed image_data to database
-    from ImageProcess import histequ
-    from ImageProcess import revimg
-    from ImageProcess import contraststretch
-    from ImageProcess import logcomp
-    from ImageProcess import gethist
-    from ImageProcess import getsize
-    from datetime import datetime
-    import numpy as np
-    import cv2
-    import base64
-    import os
     r = request.get_json()
     try:
         email = r['email']
-        action = r['action']
+        action_j = r['action']
     except KeyError as err:
         return jsonify({'response': "Invalid Key"}), 400
     else:
@@ -155,50 +143,35 @@ def action_on_imageset():
         except AssertionError as err:
             return jsonify({'response': "No process image stored"}), 400
         else:
-            imageset = jtb.getimage(brew_path)
-            imageset = [x.astype(np.uint8) for x in imageset]
-            outimg = []
-            outhist = []
-            outsize = []
-            if action[0] == 'HistEq':
-                for i in imageset:
-                    outimg.append(histequ(i, action[1]))
-            elif action[0] == 'ContStretch':
-                for i in imageset:
-                    outimg.append(contraststretch(i, action[1], action[2]))
-            elif action[0] == 'RevVid':
-                for i in imageset:
-                    outimg.append(revimg(i, action[1]))
-            elif action[0] == 'LogComp':
-                for i in imageset:
-                    outimg.append(logcomp(i, action[1]))
-            else:
+            action = []
+            for element in action_j['action']:
+                action.append(element)
+            import image_services as img_serv
+            if not img_serv.validate_action(action[0]):
                 return jsonify({'response': 'invalid action name'}), 200
-            for i in outimg:
-                outhist.append(gethist(i, action[1]))
-                outsize.append(getsize(i, action[1]))
-            # Update record in database and setup dict to send back to gui
-            db_func.update_a_record(email, 'timestamps', datetime.now())
-            db_func.update_a_record(email, 'actions', action)
-            jtb.create_directory(brew_path, "")
-            count = 0
-            togui = {}
-            togui["image"] = {}
-            togui["brew_hist"] = outhist
-            togui["imgsize"] = outsize
-            for i in outimg:
-                filename = str(count) + ".jpg"
-                cv2.imwrite(os.path.join(brew_path, filename), i)
-                retval, buffer = cv2.imencode('.jpg', i)
-                jpg_as_text = str(base64.b64encode(buffer))
-                jpg_as_text = jpg_as_text[2:-1]
-                togui["image"][str(count)] = jpg_as_text
-                count += 1
-            actionlist = db_func.query_a_record(email, "actions")
-            actionstat = jtb.calcaction(actionlist)
-            togui["actions"] = actionstat
-            togui['reponse'] = 'ok'
-            return jsonify(togui), 200
+            else:
+                # Update record in database and setup dict to send back to gui
+                from datetime import datetime
+                db_func.update_a_record(email,
+                                        'timestamps',
+                                        str(datetime.now().timestamp()))
+                db_func.update_a_record(email,
+                                        'actions',
+                                        action)
+                # process the image
+                imageset = ss.getimage(brew_path)
+                outimg = img_serv.image_processing(action, imageset)
+                # replace the image in brew_path
+                ss.update_brew_image(outimg, brew_path)
+                #
+                outhist = img_serv.get_hists(action[1], outimg)
+                outsize = img_serv.get_sizes(action[1], outimg)
+                actionstat = ss.action_stat(email)
+                togui = img_serv.ret_data_wrapper(outimg,
+                                                  outhist,
+                                                  outsize,
+                                                  actionstat)
+                return jsonify(togui), 200
 
 
 if __name__ == '__main__':
