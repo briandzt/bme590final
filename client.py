@@ -19,10 +19,10 @@ def test_api_upload():
 
     print(type(encoded_buf))
     valid_data_prefix = 'data:application/zip;base64,'
-
+    image_string = valid_data_prefix + encoded_buf.decode('utf8')
     r_status = requests.post(host_address + "api/upload",
                              json={'email': '111@duke.edu',
-                                   'imageset': valid_data_prefix + encoded_buf.decode('utf8')})
+                                   'imageset': image_string})
 
     status = r_status.json()
     print(status)

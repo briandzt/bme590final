@@ -129,7 +129,6 @@ def delete_all_files(path):
                 print(e)
 
 
-
 # read & write file from/into buffer in bytes
 # --------------------------------------------
 def write_bytes_to_file(buffer, filename):
