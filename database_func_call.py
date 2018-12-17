@@ -102,8 +102,9 @@ def query_a_record(key, field):
 
     Returns
     -------
-    string or list
-        depends on the query field
+    None, string or list
+        None is not exist,
+        else string or list depends on the query field
     """
     q = Imageset.objects.raw({"_id": key}).first()
     assert (q is not None)
@@ -176,4 +177,5 @@ def clear_fields(key, field_list):
         try:
             clear_a_field(key, field)
         except AttributeError:
-            None
+            pass
+

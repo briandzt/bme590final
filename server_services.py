@@ -37,7 +37,10 @@ def init_resource(user_id):
     import database_func_call as db_func
     user_path = jtb.string_from_email(user_id)
     jtb.create_directory(path_prefix, user_path)
-    db_func.clear_fields(user_id, field_list)
+    try:
+        db_func.clear_fields(user_id, field_list)
+    except db_func.Imageset.DoesNotExist as err:
+        pass
 
 
 def store_data(email, data):
