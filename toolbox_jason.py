@@ -28,8 +28,6 @@ file and directory operation:
 
 # create a unique directory according to an email
 # --------------------------------------------
-
-
 def is_a_validate_email(email):
     """check whether the input string has a email-style format
 
@@ -130,11 +128,6 @@ def delete_all_files(path):
             except Exception as e:
                 print(e)
 
-
-def getimage(directory):
-    import glob
-    import cv2
-    return [cv2.imread(file) for file in glob.glob(directory + "/*")]
 
 
 # read & write file from/into buffer in bytes

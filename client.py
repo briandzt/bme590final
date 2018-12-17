@@ -18,9 +18,11 @@ def test_api_upload():
     encoded_buf = jtb.encode_base64(buffer.read())
 
     print(type(encoded_buf))
+    valid_data_prefix = 'data:application/zip;base64,'
+
     r_status = requests.post(host_address + "api/upload",
                              json={'email': '111@duke.edu',
-                                   'imageset': encoded_buf.decode('utf8')})
+                                   'imageset': valid_data_prefix + encoded_buf.decode('utf8')})
 
     status = r_status.json()
     print(status)
@@ -29,7 +31,8 @@ def test_api_upload():
 def test_api_download():
     r_status = requests.post(host_address + "api/download_zip",
                              json={'email': '111@duke.edu',
-                                   'imageset': 'image_data'})
+                                   'which': 'image_data',
+                                   'format': 'jpg'})
     print(r_status.content)
     jtb.unzip_buffer(r_status.content, 'tmp/unzip')
 

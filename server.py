@@ -24,6 +24,7 @@ from flask import Flask, jsonify, request, send_file
 import toolbox_jason as jtb
 import database_func_call as db_func
 from flask_cors import CORS
+import server_services as ss
 
 app = Flask(__name__)
 
@@ -32,6 +33,8 @@ app = Flask(__name__)
 def is_a_validate_email():
     """validate if a string has a email format
 
+    check if the post json data contains a `email` field
+    check if the `email` field contains a email format string
 
     Returns
     -------
@@ -47,11 +50,6 @@ def is_a_validate_email():
         return jsonify({'response': "Cannot find valid key"}), 400
     else:
         if jtb.is_a_validate_email(email):
-            local_path = jtb.string_from_email(email)
-            jtb.create_directory('tmp/', local_path)
-            field_list = ['image_data', 'brew_image_data',
-                          'actions', 'timestampss']
-            db_func.clear_fields(email, field_list)
             return jsonify({'response': 'ok'}), 200
         else:
             return jsonify({'response': 'invalid email'}), 200
@@ -61,61 +59,32 @@ def is_a_validate_email():
 def new_imageset():
     """handle new uploaded images
 
-    the new uploaded images will be validated, stored and preprocessed
     the request should contain `user_email` and `imageset` fields
+    `user_email` and `imageset` will be validate and used to setup resource
+        create a user owned directory
+        create a user owned database record
+        stored the images
+        extra and return meta data of image
 
     Returns
     -------
     json, status code
-        meta data extracted from images will be returned
     """
-    import cv2
-    import os
-    import numpy as np
-    from ImageProcess import gethist
-    from ImageProcess import getsize
-    import base64
     r = request.get_json()
     try:
         email = r['email']
         image_data = r['imageset']
-        # image_data = image_data[28:]
     except KeyError as err:
         return jsonify({'response': "Cannot find valid key"}), 400
     else:
-        local_path = jtb.string_from_email(email)
-        if jtb.is_dir_exist('tmp/' + local_path):
-            # Define original and brew image save path
-            unzip_path = 'tmp/' + local_path + '/original'
-            brew_path = 'tmp/' + local_path + '/brew'
-            # Check if directory already exist
-            # if jtb.is_dir_exist(unzip_path):
-            #     jtb.delete_directory(unzip_path)
-            # if jtb.is_dir_exist(brew_path):
-            #     jtb.delete_directory(brew_path)
-            jtb.unzip_buffer(jtb.decode_base64(image_data.encode('utf8')),
-                             unzip_path)
-            jtb.unzip_buffer(jtb.decode_base64(image_data.encode('utf8')),
-                             brew_path)
-            db_func.save_new_record({'user_email': email,
-                                     'image_data': unzip_path,
-                                     'brew_image_data': brew_path})
-            # get original image, its size and its hist
-            # imageset = jtb.getimage(unzip_path)
-            # imageset = [x.astype(np.uint8) for x in imageset]
-            # togui = {}
-            # originhist = []
-            # originsize = []
-            # count = 0
-            # for i in imageset:
-            #     retval, buffer = cv2.imencode('.jpg', i)
-            #     jpg_as_text = str(base64.b64encode(buffer))
-            #     jpg_as_text = jpg_as_text[2:-1]
-            #     togui[str(count)] = jpg_as_text
-            #     count += 1
-            #     originhist.append(gethist(i, 'rgb'))
-            #     originsize.append(getsize(i, 'rgb'))
-            return jsonify({'response': 'ok'}), 200
+        if jtb.is_a_validate_email(email) and ss.validate_data(image_data):
+            ss.init_resource(email)
+            ss.store_data(email, image_data)
+            import image_services as img_serv
+            data_path = ss.get_data_path(email, 'original')
+            togui, originhist, originsize = img_serv.extra_meta(data_path)
+            return jsonify({'response': 'ok', 'image': togui,
+                            'hist': originhist, 'imgsize': originsize}), 200
         else:
             return jsonify({'response': 'the user does not exist'}), 200
 
@@ -131,16 +100,20 @@ def download():
     r = request.get_json()
     try:
         email = r['email']
-        field = r['imageset']
+        kind = r['which']
+        fmt = r['format']
     except KeyError as err:
         return jsonify({'response': "Input Key Invalid"}), 400
     else:
         try:
-            image_path = db_func.query_a_record(email, field)
+            image_path = db_func.query_a_record(email, kind)
         except AttributeError as err:
             return jsonify({'response': "User don't have stored image"}), 400
         else:
-            data = jtb.zip_dir_to_buffer(image_path)
+            path = ss.get_data_path(email, 'download')
+            import image_services as img_serv
+            img_serv.format_conversion_batch(path, image_path, fmt)
+            data = jtb.zip_dir_to_buffer(path)
             return send_file(
                 data,
                 mimetype='application/zip',
