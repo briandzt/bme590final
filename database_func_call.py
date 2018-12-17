@@ -178,4 +178,3 @@ def clear_fields(key, field_list):
             clear_a_field(key, field)
         except AttributeError:
             pass
-
