@@ -43,13 +43,17 @@ def test_api_upload(email, images, expected):
 
     status = r_status.json()
     print(status['response'])
-    togui = status['image']
+    image = status['image']
     hist = status['hist']
     size = status['imgsize']
     print(size[0])
-    with open(email + 'hist.txt', 'w') as f:
-        for item in hist:
-            f.write("%s\n" % item)
+    # print(hist[0])
+    import cv2
+    import base64
+    image = base64.b64decode(image['0'].encode('utf8'))
+    with open('tmp/test.jpg', 'w') as file:
+        file.write(image['0'])
+
 
     assert (status['response'] == expected)
 
@@ -76,7 +80,7 @@ def test_api_action(email, action, expected):
     print(size[0])
     print(stat)
     print(brew_hist[0])
-    print(image['1'])
+    #print(image['1'])
 
     assert (status['response'] == expected)
 

@@ -31,17 +31,16 @@ app = Flask(__name__)
 
 @app.route("/api/toolbox/validate_email", methods=["POST"])
 def is_a_validate_email():
-    """validate if a string has a email format
+    """validate if a string has an email format
 
-    check if the post json data contains a `email` field
-    check if the `email` field contains a email format string
+    the post json data should contains a `email` field
 
     Returns
     -------
-    json, status code
-        the `response` field inside json format contains detailed message
-        status code 400 if the request can't be handled by the server
-                    200 if the request can be handled by the server
+    json
+        {'response': "Cannot find valid key"} if request contains no `email`
+        {'response': 'ok'} if the string has an email form
+        {'response': 'invalid email'} if the string doesn't have an email form
     """
     r = request.get_json()
     try:
@@ -59,16 +58,32 @@ def is_a_validate_email():
 def new_imageset():
     """handle new uploaded images
 
-    the request should contain `user_email` and `imageset` fields
-    `user_email` and `imageset` will be validate and used to setup resource
-        create a user owned directory
-        create a user owned database record
-        stored the images
-        extra and return meta data of image
+    the post json data should contain `user_email` and `imageset` fields
+    `user_email` and `imageset` will be validate and used to setup resource.
+        - create a user owned directory
+        - create a user owned database record
+        - stored the images
+        - extra and return meta data of image
 
     Returns
     -------
-    json, status code
+    json
+        {'response': "Cannot find valid key"}
+        {'response': 'invalid email or corrupted data'}
+        {'response': 'ok', 'image': img_dict,
+                            'hist': hist,
+                            'imgsize': size}
+
+    Notes
+        img_dict is a dictionary, each elem has a key from 0 to n-1,
+        and a value as a str, which encoded by cv2.imencode('.jpg')
+        and then b64encode
+
+        hist is a list, each elem of which represents an image, which
+        contains three list elems for rgb or one list elem for gray
+
+        imgsize is a list, each elem of which represents an image, which
+        contains [h, w]
     """
     r = request.get_json()
     try:
@@ -84,21 +99,32 @@ def new_imageset():
             data_path = ss.get_data_path(email, 'original')
             print(data_path)
             imageset = ss.getimage(data_path)
-            originhist, originsize = img_serv.extra_meta(imageset)
+            hist, size = img_serv.extra_meta(imageset)
             img_dict = img_serv.convert_image_to_dict(imageset)
             return jsonify({'response': 'ok', 'image': img_dict,
-                            'hist': originhist, 'imgsize': originsize}), 200
+                            'hist': hist, 'imgsize': size}), 200
         else:
-            return jsonify({'response': 'the user does not exist'}), 200
+            return jsonify({'response': 'invalid email or corrupted data'}), \
+                   200
 
 
 @app.route("/api/download_zip", methods=["POST"])
 def download():
     """provide a download function for original and brewed images
 
+    the post request should contains 'email`, `which` and `format` fields.
+    `which` is 'image_data' for original image download,
+        or 'brew_image_data' for brewed images
+    `format` is a common format like `jpg`
+
     Returns
     -------
-
+    json or binary data
+        {'response': "Input Key Invalid"}
+        {'response': "User don't have stored image"}
+        binary data
+            it can be get by requests.content and should be write to a file
+            with a `.zip` suffix
     """
     r = request.get_json()
     try:
@@ -126,13 +152,40 @@ def download():
 
 @app.route("/api/image-processing/action", methods=["POST"])
 def action_on_imageset():
-    """deal with image processing request
+    """apply image processing methods on the stored images
 
+    the post request should contains `email` and `action` field
+    `action` should be one action in the list:
+        ['HistEq', 'ContStretch', 'RevVid', 'LogComp']
+
+    Returns
+    -------
+    json
+        {'response': "Invalid Key"}
+        {'response': "No process image stored"}
+        {'response': 'invalid action name'}
+        {'response': ok, "image":dict, "brew_hist":list,
+                "imgsize":list, "actions":dict}
+
+    Notes
+        image is a dictionary, each elem has a key from 0 to n-1,
+        and a value as a str, which encoded by cv2.imencode('.jpg')
+        and then b64encode
+
+        brew_hist is a list, each elem of which represents an image, which
+        contains three list elems for rgb or one list elem for gray
+
+        imgsize is a list, each elem of which represents an image, which
+        contains [h, w]
+
+        actions has the form like
+            {'ContStretch': 0, 'HistEq': 0, 'LogComp': 0, 'RevVid': 1}
     """
     r = request.get_json()
     try:
         email = r['email']
         action_j = r['action']
+        print(action_j)
     except KeyError as err:
         return jsonify({'response': "Invalid Key"}), 400
     else:
@@ -142,8 +195,13 @@ def action_on_imageset():
             return jsonify({'response': "No process image stored"}), 400
         else:
             action = []
-            for element in action_j['action']:
-                action.append(element)
+            if isinstance(action_j, dict):
+                action_list = action_j['action']
+                for element in action_list:
+                    action.append(element)
+            if isinstance(action_j, list):
+                action = action_j
+            print(action)
             import image_services as img_serv
             if not img_serv.validate_action(action[0]):
                 return jsonify({'response': 'invalid action name'}), 200
