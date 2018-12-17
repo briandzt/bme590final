@@ -110,8 +110,6 @@ def download():
     else:
         try:
             image_path = db_func.query_a_record(email, kind)
-            print("request json is {}".format(r))
-            print("email is {}, kind is {}, path is {}".format(email, kind, image_path))
         except AttributeError as err:
             return jsonify({'response': "User don't have stored image"}), 400
         else:

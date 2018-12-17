@@ -139,4 +139,3 @@ def format_conversion_batch(dest_dir, source_dir, new_format):
     directory = Path(source_dir)
     for f_name in directory.iterdir():
         format_conversion(dest_dir, f_name, new_format)
-
